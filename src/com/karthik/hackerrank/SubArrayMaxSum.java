@@ -57,9 +57,9 @@ public class SubArrayMaxSum {
         Node right;
 
         public Node(long value, Node left, Node right) {
-            value = this.value;
-            left = this.left;
-            right = this.right;
+            this.value = value;
+            this.left = left;
+            this.right = right;
         }
     }
 
@@ -72,7 +72,9 @@ public class SubArrayMaxSum {
         }
 
         public void insert(long n) {
-           root = insert(root, n);
+            if (!contains(root, n)) {
+                root = insert(root, n);
+            }
         }
 
         public Long ceilOrN(long n) {
@@ -90,9 +92,9 @@ public class SubArrayMaxSum {
             if (x.value == n) {
                 return x;
             }
-            if(x.value > n) {
+            if (x.value > n) {
                 Node t = ceil(x.left, n);
-                if(t==null) {
+                if (t == null) {
                     return x;
                 }
                 return t;
@@ -106,7 +108,7 @@ public class SubArrayMaxSum {
             }
 
             if (x.value == n) {
-               x.value=n;
+                x.value = n;
             } else if (x.value > n) {
                 x.left = insert(x.left, n);
             } else {
@@ -158,14 +160,15 @@ public class SubArrayMaxSum {
         //t.add(modm[0]);
         Node root = new Node(modm[0], null, null);
         BST bst = new BST(root);
-        
+
         for (int i = 1; i < n; i++) {
             Long start = bst.ceilOrN(modm[i]);
             //Long start = t.ceiling(modm[i]);
-            if(start != null) {
-            System.out.println("entry:"+modm[i]+" start:"+start);
+
+            if (start != null) {
                 max = Math.max(max, ((modm[i] - start) + m) % m);
             }
+
             //t.add(modm[i]);
             bst.insert(modm[i]);
         }
