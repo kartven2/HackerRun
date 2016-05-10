@@ -1,5 +1,16 @@
+/*-
+ * HackerRun problem :
+ * https://www.hackerrank.com/challenges/maximise-sum
+ *
+ * Find maximum sub array sum modulo m.
+ * 
+ */
 package com.karthik.hackerrank;
 
+/**
+ * @author Karthik Venkataraman
+ * @email kafy83@gmail.com
+ */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
