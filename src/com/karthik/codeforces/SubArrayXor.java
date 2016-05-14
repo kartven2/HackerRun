@@ -7,7 +7,9 @@ package com.karthik.codeforces;
  * Find the subarrays whose xor value is atleast k.
  * 
  */
-import java.util.Scanner;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.InputMismatchException;
 
 /**
  * @author Karthik Venkataraman
@@ -17,7 +19,7 @@ public class SubArrayXor {
 
     private int n;
     private int k;
-    private Scanner sc;
+    private InputReader sc;
     private long output;
 
     private static class Trie {
@@ -103,7 +105,7 @@ public class SubArrayXor {
     }
 
     private void input() {
-        sc = new Scanner(System.in);
+        sc = new InputReader(System.in);
         n = sc.nextInt();
         k = sc.nextInt();
     }
@@ -117,5 +119,62 @@ public class SubArrayXor {
         b.input();
         b.compute();
         b.output();
+    }
+
+    static class InputReader {
+
+        private static final int blength = 8192;
+        private InputStream inputStream;
+        private byte[] buffer;
+        private int currentByte, numberOfBytesRead;
+
+        public InputReader(InputStream inputStream) {
+            this.inputStream = inputStream;
+            this.buffer = new byte[blength];
+        }
+
+        private boolean isSpaceChar(int c) {
+            return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
+        }
+
+        private int readNext() {
+            if (numberOfBytesRead == -1) {
+                throw new InputMismatchException();
+            }
+            if (currentByte >= numberOfBytesRead) {
+                currentByte = 0;
+                try {
+                    numberOfBytesRead = inputStream.read(buffer);
+                } catch (IOException e) {
+                    throw new InputMismatchException();
+                }
+                if (numberOfBytesRead <= 0) {
+                    return -1;
+                }
+            }
+            return buffer[currentByte++];
+        }
+
+        public int nextInt() {
+            int nextChar = readNext();
+            while (isSpaceChar(nextChar)) {
+                nextChar = readNext();
+            }
+            int sign = 1;
+            if (nextChar == '-') {
+                sign = -1;
+                nextChar = readNext();
+            }
+            int number = 0;
+            do {
+                if (nextChar < '0' || nextChar > '9') {
+                    throw new InputMismatchException();
+                }
+                number *= 10;
+                number += nextChar - '0';
+                nextChar = readNext();
+            } while (!isSpaceChar(nextChar));
+            return number * sign;
+        }
     }
 }
