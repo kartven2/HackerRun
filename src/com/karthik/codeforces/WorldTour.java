@@ -54,44 +54,15 @@ public class WorldTour {
         }
     }
 
-    static class Path implements Comparable {
+    static class WeightedEdge {
 
-        private int[] vertex;
-        private int pathCost;
-
-        public Path(int[] vertex, int pathCost) {
-            this.vertex = vertex;
-            this.pathCost = pathCost;
-        }
-
-        @Override
-        public int compareTo(Object that) {
-            return this.pathCost - ((Path) that).pathCost;
-        }
-    }
-
-    static class Edge {
-
-        protected int from;
-        protected int to;
-
-        Edge(int from, int to) {
-            this.from = from;
-            this.to = to;
-        }
-
-        @Override
-        public String toString() {
-            return "Edge{" + "from=" + from + ", to=" + to + '}';
-        }
-    }
-
-    static class WeightedEdge extends Edge {
-
+        private int from;
+        private int to;
         private int weight;
 
         public WeightedEdge(int from, int to, int weight) {
-            super(from, to);
+            this.from = from;
+            this.to = to;
             this.weight = weight;
         }
     }
@@ -122,7 +93,6 @@ public class WorldTour {
         private static final int MAX = Integer.MAX_VALUE;
         private int distTo[];
         private boolean marked[];
-        private Edge maxEdge;
 
         Bfs(Graph G, int s, int[][] adj) {
             distTo = new int[G.totalVertices + 1];
@@ -147,98 +117,127 @@ public class WorldTour {
                 }
             }
 
-            int maxWeight = -1;
             for (int v = 1; v <= G.totalVertices; v++) {
                 adj[s][v] = distTo[v] == MAX ? -1 : distTo[v];
-                if (adj[s][v] > maxWeight) {
-                    maxEdge = new Edge(s, v);
-                    maxWeight = adj[s][v];
-                }
             }
         }
     }
 
-    private Edge maxEdgeInGraph;
-    private int[][] adj;
+    static class City implements Comparable<City> {
 
-    private void updateMaxEdgeInGraph(Edge maxEdge) {
-        if (maxEdge != null && adj[maxEdge.from][maxEdge.to] > adj[maxEdgeInGraph.from][maxEdgeInGraph.to]) {
-            maxEdgeInGraph = maxEdge;
+        private int cityId;
+        private int distance;
+
+        public City(int cityId, int distance) {
+            this.cityId = cityId;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(City that) {
+            return that.distance - this.distance;
         }
     }
+
+    private int[][] adj;
 
     private void compute() {
         //InputReader sc = new InputReader(System.in);
         InputReader sc = null;
         try {
-            sc = new InputReader(new FileInputStream(new File("./resources/worldtour3")));
+            sc = new InputReader(new FileInputStream(new File("./resources/worldtour")));
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
+
+        //Build Graph
         Graph G = new Graph(sc);
-        maxEdgeInGraph = new Edge(1, 1);
         adj = new int[G.totalVertices + 1][G.totalVertices + 1];
+
+        //Run BFS from each vertex and fill adjacency matrix
         for (int v = 1; v <= G.totalVertices; v++) {
             Bfs bfs = new Bfs(G, v, adj);
-            updateMaxEdgeInGraph(bfs.maxEdge);
         }
-        printAdjMatrix();
-        Path allPath[] = new Path[3];
-        //option 1: x -> y -> maxEdgeFrom -> maxEdgeTo
-        List<Integer> skip = new ArrayList<>();
-        skip.add(maxEdgeInGraph.from);
-        skip.add(maxEdgeInGraph.to);
-        int y = findMaxFromVertex(maxEdgeInGraph.from, skip);
-        skip.add(y);
-        int x = findMaxFromVertex(y, skip);
-        int option1Cost = adj[x][y] + adj[y][maxEdgeInGraph.from] + adj[maxEdgeInGraph.from][maxEdgeInGraph.to];
-        int[] vertexInPath = {x, y, maxEdgeInGraph.from, maxEdgeInGraph.to};
-        allPath[0] = new Path(vertexInPath, option1Cost);
 
-        //option 2: y -> maxEdgeFrom -> maxEdgeTo -> x
-        x = findMaxToVertex(maxEdgeInGraph.to, skip);
-        int option2Cost = adj[y][maxEdgeInGraph.from] + adj[maxEdgeInGraph.from][maxEdgeInGraph.to] + adj[maxEdgeInGraph.to][x];
-        vertexInPath = new int[]{y, maxEdgeInGraph.from, maxEdgeInGraph.to, x};
-        allPath[1] = new Path(vertexInPath, option2Cost);
+        //printAdjMatrix();
+        // Find the farthest 3 cities to each city
+        City[][] threeFurthestTo = new City[G.totalVertices + 1][4];
+        // Find the farthest 3 cities from each city
+        City[][] threeFurthestFrom = new City[G.totalVertices + 1][4];
 
-        //option 3: maxEdgeFrom -> maxEdgeTo -> x -> y
-        skip = new ArrayList<>();
-        skip.add(maxEdgeInGraph.from);
-        skip.add(maxEdgeInGraph.to);
-        skip.add(x);
-        y = findMaxToVertex(x, skip);
-        int option3Cost = adj[maxEdgeInGraph.from][maxEdgeInGraph.to] + adj[maxEdgeInGraph.to][x] + adj[x][y];
-        vertexInPath = new int[]{maxEdgeInGraph.from, maxEdgeInGraph.to, x, y};
-        allPath[2] = new Path(vertexInPath, option3Cost);
+        for (int i = 1; i <= G.totalVertices; i++) {
+            City[] source = new City[G.totalVertices + 1];
+            int sourceIdx = 1;
+            City[] dest = new City[G.totalVertices + 1];
+            int destIdx = 1;
+            for (int j = 1; j <= G.totalVertices; j++) {
+                if (adj[j][i] > 0) {
+                    source[sourceIdx] = new City(j, adj[j][i]);
+                    sourceIdx++;
+                }
+                if (adj[i][j] > 0) {
+                    dest[destIdx] = new City(j, adj[i][j]);
+                    destIdx++;
+                }
+            }
+            Arrays.sort(source, 1, sourceIdx);
+            threeFurthestTo[i][1] = source[1];
+            threeFurthestTo[i][2] = source[2];
+            threeFurthestTo[i][3] = source[3];
+            Arrays.sort(dest, 1, destIdx);
+            threeFurthestFrom[i][1] = dest[1];
+            threeFurthestFrom[i][2] = dest[2];
+            threeFurthestFrom[i][3] = dest[3];
+        }
 
-        Arrays.sort(allPath);
-        for (int output : allPath[2].vertex) {
-            System.out.print(output + " ");
+        //printMax3To(threeFurthestTo);
+        //printMax3From(threeFurthestFrom);
+        //For every path a -> x -> y -> b find the largest path
+        int max = 0;
+        int[] result = new int[4];
+        for (int x = 1; x <= G.totalVertices; x++) {
+            for (int y = 1; y <= G.totalVertices; y++) {
+                if (adj[x][y] > 0) {
+                    for (int a = 1; a < 4; a++) {
+                        City start = threeFurthestTo[x][a];
+                        if (start != null) {
+                            for (int b = 1; b < 4; b++) {
+                                City end = threeFurthestFrom[y][b];
+                                if (end != null) {
+                                    int startCityId = start.cityId;
+                                    int endCityId = end.cityId;
+                                    if (isDistinctCity(startCityId, x, y, endCityId)) {
+                                        int sum = adj[startCityId][x] + adj[x][y] + adj[y][endCityId];
+                                        if (sum > max) {
+                                            result[0] = startCityId;
+                                            result[1] = x;
+                                            result[2] = y;
+                                            result[3] = endCityId;
+                                            max = sum;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int x : result) {
+            System.out.print(x + " ");
         }
     }
 
-    private int findMaxFromVertex(int toVertex, List<Integer> skipList) {
-        int max = -2;
-        int result = 1;
-        for (int i = 1; i < adj.length; i++) {
-            if (adj[i][toVertex] > max && !skipList.contains(i)) {
-                max = adj[i][toVertex];
-                result = i;
+    private boolean isDistinctCity(int a, int x, int y, int b) {
+        int[] arr = new int[]{a, x, y, b};
+        Arrays.sort(arr);
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] == arr[i - 1]) {
+                return false;
             }
         }
-        return result;
-    }
-
-    private int findMaxToVertex(int fromVertex, List<Integer> skipList) {
-        int max = -2;
-        int result = 1;
-        for (int i = 1; i < adj[fromVertex].length; i++) {
-            if (adj[fromVertex][i] > max && !skipList.contains(i)) {
-                max = adj[fromVertex][i];
-                result = i;
-            }
-        }
-        return result;
+        return true;
     }
 
     private void printAdjMatrix() {
@@ -247,6 +246,28 @@ public class WorldTour {
                 System.out.print(adj[i][j] + " ");
             }
             System.out.println();
+        }
+    }
+
+    private void printMax3To(City[][] threeFurthestTo) {
+        for (int i = 1; i < threeFurthestTo.length; i++) {
+            System.out.println("-----------Farthest city to reach" + i + "-------------------------");
+            for (int j = 1; j < threeFurthestTo[i].length; j++) {
+                System.out.print(threeFurthestTo[i][j].cityId + " ");
+            }
+            System.out.println();
+            System.out.println("------------------------------------");
+        }
+    }
+
+    private void printMax3From(City[][] threeFurthestFrom) {
+        for (int i = 1; i < threeFurthestFrom.length; i++) {
+            System.out.println("-----------City Farthest from" + i + "-------------------------");
+            for (int j = 1; j < threeFurthestFrom[i].length; j++) {
+                System.out.print(threeFurthestFrom[i][j].cityId + " ");
+            }
+            System.out.println();
+            System.out.println("------------------------------------");
         }
     }
 
