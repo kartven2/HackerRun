@@ -230,12 +230,8 @@ public class WorldTour {
     }
 
     private boolean isDistinctCity(int a, int x, int y, int b) {
-        int[] arr = new int[]{a, x, y, b};
-        Arrays.sort(arr);
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] == arr[i - 1]) {
-                return false;
-            }
+        if (a == x || a == y || a == b || x == y || x == b || y == b) {
+            return false;
         }
         return true;
     }
