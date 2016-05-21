@@ -22,7 +22,6 @@ import java.util.StringTokenizer;
 public class ReberlandLinguistics {
 
     private String input;
-    private char[] ic;
 
     static class InputReader {
 
@@ -47,6 +46,7 @@ public class ReberlandLinguistics {
     }
 
     static class Tst {
+
         private Node root;
         private int n;
 
@@ -60,7 +60,6 @@ public class ReberlandLinguistics {
         }
 
         private void insert(String m) {
-            n++;
             root = insert(root, 0, m);
         }
 
@@ -77,30 +76,25 @@ public class ReberlandLinguistics {
                 x.r = insert(x.r, d, m);
             } else if (d < m.length() - 1) {
                 x.m = insert(x.m, d + 1, m);
-            } else {
+            } else if (!x.eos) {
+                n++;
                 x.eos = true;
             }
 
             return x;
         }
-        
+
         private void print(Node x, StringBuilder prefix) {
-          if(x==null) {
-              return;
-          }
-          if(x.l != null) {
-              print(x.l, prefix);
-          }
-          if(x.eos) {
-              System.out.println(prefix.toString());
-          }
-          if(x.m != null) {
-              print(x.m, prefix.append(x.c));
-          }
-          prefix.deleteCharAt(prefix.length()-1);
-          if(x.r != null) {
-              print(x.r, prefix);
-          }
+            if (x == null) {
+                return;
+            }
+            print(x.l, prefix);
+            if (x.eos) {
+                System.out.println(prefix.toString() + x.c);
+            }
+            print(x.m, prefix.append(x.c));
+            prefix.deleteCharAt(prefix.length() - 1);
+            print(x.r, prefix);
         }
 
         private void print() {
@@ -109,23 +103,100 @@ public class ReberlandLinguistics {
     }
 
     private void input() {
-        InputReader sc = new InputReader(System.in);
-        input = sc.readNext();
-        ic = input.toCharArray();
+        //InputReader sc = new InputReader(System.in);
+        //input = sc.readNext();
+        input = "oawtxikrpvfuzugjweki";
         compute();
     }
 
     private void compute() {
         int result = 0;
         if (input.length() <= 6) {
-            System.out.print(result);
+            System.out.println(result);
             return;
         }
-        
-        Tst st2d = new Tst();
-        Tst st3d = new Tst();
-        
-        for(int i=ic.length-1; i>5; i--) {
+
+        Tst tst = new Tst();
+
+        for (int i = input.length() - 1; i - 3 >= 3; i -= 2) {
+            if (i - 3 == 3) {
+                tst.insert(input.substring(i - 1, i + 1));
+                break;
+            }
+
+            if (input.charAt(i - 2) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 3)) {
+                break;
+            }
+
+            tst.insert(input.substring(i - 1, i + 1));
         }
+
+        for (int i = input.length() - 4; i - 3 >= 3; i -= 2) {
+            if (i - 3 == 3) {
+                tst.insert(input.substring(i - 1, i + 1));
+                break;
+            }
+
+            if (input.charAt(i - 2) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 3)) {
+                break;
+            }
+
+            tst.insert(input.substring(i - 1, i + 1));
+        }
+
+        for (int i = input.length() - 1; i - 5 >= 3; i -= 3) {
+            if (i - 5 == 3) {
+                tst.insert(input.substring(i - 2, i + 1));
+                break;
+            }
+
+            if (input.charAt(i - 3) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 4)
+                    && input.charAt(i - 2) == input.charAt(i - 5)) {
+                break;
+            }
+
+            tst.insert(input.substring(i - 2, i + 1));
+        }
+
+        for (int i = input.length() - 3; i - 5 >= 2; i -= 2) {
+            if (i - 5 == 2) {
+                tst.insert(input.substring(i - 2, i + 1));
+                break;
+            }
+
+            if (input.charAt(i - 3) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 4)
+                    && input.charAt(i - 2) == input.charAt(i - 5)) {
+                break;
+            }
+
+            tst.insert(input.substring(i - 2, i + 1));
+        }
+
+        for (int i = input.length() - 3; i - 5 >= 2; i -= 3) {
+            if (i - 5 == 2) {
+                tst.insert(input.substring(i - 2, i + 1));
+                break;
+            }
+
+            if (input.charAt(i - 3) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 4)
+                    && input.charAt(i - 2) == input.charAt(i - 5)) {
+                break;
+            }
+
+            tst.insert(input.substring(i - 2, i + 1));
+        }
+
+        System.out.println(tst.n);
+        tst.print();
+    }
+
+    public static void main(String[] args) {
+        ReberlandLinguistics r = new ReberlandLinguistics();
+        r.input();
     }
 }
