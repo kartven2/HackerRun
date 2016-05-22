@@ -13,6 +13,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -23,6 +26,7 @@ public class ReberlandLinguistics {
 
     private String input;
     private Tst tst;
+    private Set<SuffixInstance> createdSet;
 
     static class InputReader {
 
@@ -109,87 +113,81 @@ public class ReberlandLinguistics {
         compute();
     }
 
-    private int find2Strides(int start) {
-
-        int limit = start % 2 == 0 ? 4 : 5;
-
-        for (int i = start; i > limit; i -= 2) {
-
-            if (input.charAt(i - 2) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 3)) {
-                return i;
-            }
-
-            if (i > 5) {
-                tst.insert(input.substring(i - 1, i + 1));
-            }
-        }
-
-        return -1;
-    }
-
-    private int find3Strides(int start, int skip) {
-
-        int limit = start % 2 == 0 ? 4 : 5;
-
-        for (int i = start; i > limit; i -= skip) {
-
-            if (input.charAt(i - 3) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 4)
-                    && input.charAt(i - 2) == input.charAt(i - 5)) {
-                return i;
-            }
-
-            if (i > 6) {
-                tst.insert(input.substring(i - 2, i + 1));
-            }
-        }
-
-        return -1;
-    }
-
     private void compute() {
         int result = 0;
         if (input.length() <= 6) {
             System.out.println(result);
             return;
         }
-
         tst = new Tst();
-
-        int i = input.length();
-        i = find2Strides(i - 4);
-        while (i > -1) {
-            i = find2Strides(i - 1);
-        }
-
-        i = input.length();
-        i = find2Strides(i - 1);
-        while (i > -1) {
-            i = find2Strides(i - 2);
-        }
-
-        i = input.length();
-        while (i > -1) {
-            i = find3Strides(i - 3, 2);
-        }
-
-        i = input.length();
-        while (i > -1) {
-            i = find3Strides(i - 3, 1);
-        }
-
-        i = input.length();
-        while (i > -1) {
-            i = find3Strides(i - 1, 3);
-        }
-
+        createdSet = new HashSet<>();
+        compute("", input.length());
         System.out.println(tst.n);
         tst.print();
     }
 
+    private void compute(String suffix, int idx) {
+        SuffixInstance suffixInstance = new SuffixInstance(suffix, idx);
+        if (!createdSet.add(suffixInstance)) {
+            return;
+        }
+
+        if (idx >= 7) {
+            String stride2Entry = input.substring(idx - 2, idx);
+            if (!suffix.equals(stride2Entry)) {
+                tst.insert(stride2Entry);
+                compute(stride2Entry, idx - 2);
+            }
+        }
+
+        if (idx >= 8) {
+            String stride3Entry = input.substring(idx - 3, idx);
+            if (!suffix.equals(stride3Entry)) {
+                tst.insert(stride3Entry);
+                compute(stride3Entry, idx - 3);
+            }
+        }
+    }
+
+    static class SuffixInstance {
+
+        private String suffix;
+        private int idx;
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 89 * hash + Objects.hashCode(this.suffix);
+            hash = 89 * hash + this.idx;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final SuffixInstance other = (SuffixInstance) obj;
+            if (!Objects.equals(this.suffix, other.suffix)) {
+                return false;
+            }
+            if (this.idx != other.idx) {
+                return false;
+            }
+            return true;
+        }
+
+        public SuffixInstance(String suffix, int idx) {
+            this.suffix = suffix;
+            this.idx = idx;
+        }
+    }
+
     public static void main(String[] args) {
-        ReberlandLinguistics r = new ReberlandLinguistics();
-        r.input();
+        ReberlandLinguistics reberlandLinguistics = new ReberlandLinguistics();
+        reberlandLinguistics.input();
     }
 }
