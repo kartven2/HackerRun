@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 public class ReberlandLinguistics {
 
     private String input;
+    private Tst tst;
 
     static class InputReader {
 
@@ -103,10 +104,48 @@ public class ReberlandLinguistics {
     }
 
     private void input() {
-        //InputReader sc = new InputReader(System.in);
-        //input = sc.readNext();
-        input = "oawtxikrpvfuzugjweki";
+        InputReader sc = new InputReader(System.in);
+        input = sc.readNext();
         compute();
+    }
+
+    private int find2Strides(int start) {
+
+        int limit = start % 2 == 0 ? 4 : 5;
+
+        for (int i = start; i > limit; i -= 2) {
+
+            if (input.charAt(i - 2) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 3)) {
+                return i;
+            }
+
+            if (i > 5) {
+                tst.insert(input.substring(i - 1, i + 1));
+            }
+        }
+
+        return -1;
+    }
+
+    private int find3Strides(int start, int skip) {
+
+        int limit = start % 2 == 0 ? 4 : 5;
+
+        for (int i = start; i > limit; i -= skip) {
+
+            if (input.charAt(i - 3) == input.charAt(i)
+                    && input.charAt(i - 1) == input.charAt(i - 4)
+                    && input.charAt(i - 2) == input.charAt(i - 5)) {
+                return i;
+            }
+
+            if (i > 6) {
+                tst.insert(input.substring(i - 2, i + 1));
+            }
+        }
+
+        return -1;
     }
 
     private void compute() {
@@ -116,79 +155,33 @@ public class ReberlandLinguistics {
             return;
         }
 
-        Tst tst = new Tst();
+        tst = new Tst();
 
-        for (int i = input.length() - 1; i - 3 >= 3; i -= 2) {
-            if (i - 3 == 3) {
-                tst.insert(input.substring(i - 1, i + 1));
-                break;
-            }
-
-            if (input.charAt(i - 2) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 3)) {
-                break;
-            }
-
-            tst.insert(input.substring(i - 1, i + 1));
+        int i = input.length();
+        i = find2Strides(i - 4);
+        while (i > -1) {
+            i = find2Strides(i - 1);
         }
 
-        for (int i = input.length() - 4; i - 3 >= 3; i -= 2) {
-            if (i - 3 == 3) {
-                tst.insert(input.substring(i - 1, i + 1));
-                break;
-            }
-
-            if (input.charAt(i - 2) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 3)) {
-                break;
-            }
-
-            tst.insert(input.substring(i - 1, i + 1));
+        i = input.length();
+        i = find2Strides(i - 1);
+        while (i > -1) {
+            i = find2Strides(i - 2);
         }
 
-        for (int i = input.length() - 1; i - 5 >= 3; i -= 3) {
-            if (i - 5 == 3) {
-                tst.insert(input.substring(i - 2, i + 1));
-                break;
-            }
-
-            if (input.charAt(i - 3) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 4)
-                    && input.charAt(i - 2) == input.charAt(i - 5)) {
-                break;
-            }
-
-            tst.insert(input.substring(i - 2, i + 1));
+        i = input.length();
+        while (i > -1) {
+            i = find3Strides(i - 3, 2);
         }
 
-        for (int i = input.length() - 3; i - 5 >= 2; i -= 2) {
-            if (i - 5 == 2) {
-                tst.insert(input.substring(i - 2, i + 1));
-                break;
-            }
-
-            if (input.charAt(i - 3) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 4)
-                    && input.charAt(i - 2) == input.charAt(i - 5)) {
-                break;
-            }
-
-            tst.insert(input.substring(i - 2, i + 1));
+        i = input.length();
+        while (i > -1) {
+            i = find3Strides(i - 3, 1);
         }
 
-        for (int i = input.length() - 3; i - 5 >= 2; i -= 3) {
-            if (i - 5 == 2) {
-                tst.insert(input.substring(i - 2, i + 1));
-                break;
-            }
-
-            if (input.charAt(i - 3) == input.charAt(i)
-                    && input.charAt(i - 1) == input.charAt(i - 4)
-                    && input.charAt(i - 2) == input.charAt(i - 5)) {
-                break;
-            }
-
-            tst.insert(input.substring(i - 2, i + 1));
+        i = input.length();
+        while (i > -1) {
+            i = find3Strides(i - 1, 3);
         }
 
         System.out.println(tst.n);
