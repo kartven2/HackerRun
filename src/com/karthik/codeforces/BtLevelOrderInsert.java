@@ -11,6 +11,7 @@ import java.util.List;
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
  */
+@SuppressWarnings("unchecked")
 public class BtLevelOrderInsert {
 
     static class Bt {
@@ -182,9 +183,18 @@ public class BtLevelOrderInsert {
     public static void main(String[] args) {
         Bt b = new Bt();
         int[] input = {5, 6, 7, 8, 4, 7, 8, 9, 1, 2, 5, 8, 9, 2, 3, 4, 5, 7, 8};
-        for (int a : input) {
-            b.insert(a);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Insertion order:[ ");
+        for (int i = 0; i < input.length; i++) {
+            b.insert(input[i]);
+            sb.append(input[i]);
+            if (i < input.length - 1) {
+                sb.append(",");
+            }
         }
+        sb.append(" ]");
+        System.out.println(sb.toString());
+        System.out.println();
         BTreePrinter.printNode(b.root);
     }
 }
