@@ -12,11 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
@@ -25,28 +22,102 @@ import java.util.StringTokenizer;
  */
 public class DeliveryBears {
 
-    private boolean hasAugmentingPath() {
-        marked = new boolean[n + 1];
-        edgeTo = new int[n + 1];
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(1);
-        marked[1] = true;
-        while (!queue.isEmpty() && !marked[n]) {
-            int v = queue.remove();
-            for (int w : adj[v]) {
-                if (weight[v][w] > 0.0) {
-                    if (!marked[w]) {
-                        marked[w] = true;
-                        edgeTo[w] = v;
-                        queue.add(w);
-                    }
-                }
-            }
+    private int n;
+    private int m;
+    private int x;
+    private int[][] capacity;
+    private int[][] testArr;
+    private FixedList<Integer>[] adj;
+    private int[] edgeTo;
+    private boolean[] marked;
+    private ResizingQueue<Integer> queue;
+
+    class ResizingQueue<T> {
+
+        private T[] items;
+        private int last;
+        private int first;
+        private int size;
+
+        ResizingQueue(int capacity) {
+            this.items = (T[]) new Object[capacity];
         }
-        return marked[n];
+
+        void resize(int max) {
+            T[] temp = (T[]) new Object[max];
+            for (int i = 0; i < size; i++) {
+                temp[i] = items[(first + i) % items.length];
+            }
+            items = temp;
+            first = 0;
+            last = size;
+        }
+
+        boolean isEmpty() {
+            return size == 0;
+        }
+
+        void enqueue(T value) {
+            if (size == items.length) {
+                resize(2 * items.length);
+            }
+            items[last++] = value;
+            if (last == items.length) {
+                last = 0;
+            }
+            size++;
+        }
+
+        T dequeue() {
+            T item = items[first];
+            items[first] = null;
+            size--;
+            first++;
+            if (first == items.length) {
+                first = 0;
+            }
+            return item;
+        }
     }
 
-    static class InputReader {
+    class FixedList<T> implements Iterable<T> {
+
+        class FixedListIterator<T> implements Iterator<T> {
+
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < size;
+            }
+
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                return (T) items[i++];
+            }
+
+        }
+        private T[] items;
+        private int size;
+
+        FixedList(int capacity) {
+            this.items = (T[]) new Object[capacity];
+        }
+
+        void add(T value) {
+            items[size++] = value;
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return new FixedListIterator();
+        }
+    }
+
+    class InputReader {
 
         private static final int inputkb = 5 * 1024;
         private BufferedReader reader;
@@ -67,27 +138,48 @@ public class DeliveryBears {
             return tokenizer.nextToken();
         }
 
-        private double nextDouble() {
-            return Double.parseDouble(readNext());
-        }
-
         private int nextInt() {
             return Integer.parseInt(readNext());
         }
     }
 
-    private boolean[] marked;
-    private int[] edgeTo;
-    private double[][] weight;
-    private List<Integer>[] adj;
-    private int n;
-    private int m;
-    private int x;
-    private int r;
-    private double[] processedPath;
-    private double totalWeight;
-    private int bearsHi;
-    private int bearsLo;
+    private boolean hasAugmentingPath() {
+        marked = new boolean[n];
+        edgeTo = new int[n];
+        queue = new ResizingQueue<>(n);
+        queue.enqueue(0);
+        marked[0] = true;
+        edgeTo[0] = -1;
+        while (!queue.isEmpty() && !marked[n - 1]) {
+            int v = queue.dequeue();
+            for (int w : adj[v]) {
+                if (testArr[v][w] > 0) {
+                    if (!marked[w]) {
+                        marked[w] = true;
+                        edgeTo[w] = v;
+                        queue.enqueue(w);
+                    }
+                }
+            }
+        }
+        return marked[n - 1];
+    }
+
+    private long findMaxFlow() {
+        long maxflow = 0;
+        while (hasAugmentingPath()) {
+            double bottle = Double.POSITIVE_INFINITY;
+            for (int v = n - 1; v != 0; v = edgeTo[v]) {
+                bottle = Math.min(bottle, testArr[edgeTo[v]][v]);
+            }
+            for (int v = n - 1; v != 0; v = edgeTo[v]) {
+                testArr[edgeTo[v]][v] -= bottle;
+                testArr[v][edgeTo[v]] += bottle;
+            }
+            maxflow += bottle;
+        }
+        return maxflow;
+    }
 
     private void compute() {
         //InputReader sc = new InputReader(System.in);
@@ -100,52 +192,35 @@ public class DeliveryBears {
         n = sc.nextInt();
         m = sc.nextInt();
         x = sc.nextInt();
-        weight = new double[n + 1][n + 1];
-        adj = (List<Integer>[]) new ArrayList[n + 1];
-        for (int i = 1; i <= n; i++) {
-            adj[i] = new ArrayList<>();
+        capacity = new int[n][n];
+        testArr = new int[n][n];
+        adj = (FixedList<Integer>[]) new FixedList[n];
+        for (int i = 0; i < n; i++) {
+            adj[i] = new FixedList<>(n);
         }
         for (int i = 0; i < m; i++) {
-            int from = sc.nextInt();
-            int to = sc.nextInt();
-            weight[from][to] = sc.nextDouble();
+            int from = sc.nextInt() - 1;
+            int to = sc.nextInt() - 1;
+            capacity[from][to] = sc.nextInt();
             adj[from].add(to);
         }
-        processedPath = new double[n + 1];
-        while (hasAugmentingPath()) {
-            double bottle = Double.POSITIVE_INFINITY;
-            for (int v = n; v != 1; v = edgeTo[v]) {
-                bottle = Math.min(bottle, weight[edgeTo[v]][v]);
-            }
-            for (int v = n; v != 1; v = edgeTo[v]) {
-                weight[edgeTo[v]][v] -= bottle;
-            }
-            totalWeight += bottle;
-            processedPath[r++] = bottle;
 
-        }
-        if (totalWeight >= x) {
-            System.out.println(String.format("%.10f", totalWeight));
-            return;
-        }
-        Arrays.sort(processedPath, 0, r);
-        double optimalWeight = totalWeight / x;
-        int remainingBears = x;
-        for (int i = r - 1; i >= 0; i--) {
-            double bearCount = processedPath[i] / optimalWeight;
-            int bearCountInt = (int) Math.round(bearCount);
-            if (i == r - 1) {
-                bearsHi = bearCountInt;
-            } else if (i == 0) {
-                bearsLo = bearCountInt;
+        double lo = 0, hi = 1e7;
+        for (int iter = 0; iter < 100; iter++) {
+            double mid = (lo + hi) / 2;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    testArr[i][j] = (int) (capacity[i][j] / mid);
+                }
             }
+            if (findMaxFlow() >= x) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
 
-            remainingBears -= bearCountInt;
-        }
-        if (remainingBears > 0) {
-            bearsHi += remainingBears;
-        }
-        System.out.println(String.format("%.10f", Math.min((processedPath[r - 1] / bearsHi), (processedPath[0] / bearsLo)) * x));
+        System.out.println(String.format("%.10f", lo * x));
     }
 
     public static void main(String[] args) {
