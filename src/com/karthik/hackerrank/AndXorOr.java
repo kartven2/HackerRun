@@ -1,5 +1,5 @@
 /*-
- * HackerRun problem :
+ * HackerRank problem :
  * https://www.hackerrank.com/challenges/and-xor-or
  *
  * Find the maximum subsequence value in an array for 
@@ -17,8 +17,8 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 /**
- *
- * @author Karthik
+ * @author Karthik Venkataraman
+ * @email kafy83@gmail.com
  */
 public class AndXorOr {
 
