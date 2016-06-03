@@ -2,7 +2,7 @@
  * Codeforces problem :
  * http://codeforces.com/problemset/problem/645/C
  *
- * Find the minimum possible distance between Farmer John's room and his farthest cow..
+ * Find the minimum possible distance between Farmer John's room and his farthest cow.
  * 
  */
 package com.karthik.codeforces;
