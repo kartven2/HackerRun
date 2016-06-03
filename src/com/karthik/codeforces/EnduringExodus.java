@@ -59,7 +59,7 @@ public class EnduringExodus {
         //InputReader sc = new InputReader(System.in);
         InputReader sc = null;
         try {
-            sc = new InputReader(new FileInputStream("./resources/enduringexodus"));
+            sc = new InputReader(new FileInputStream("./resources/enduringexodus3"));
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -102,37 +102,23 @@ public class EnduringExodus {
         int fresult = MAX_VALUE;
         for (int m = 0; m < bestPtr; m++) {
             if (best == bestIdx[1][m] - bestIdx[0][m] + 1) {
-                int result = 0;
-                if (best % 2 == 0) {
-                    int m1 = bestIdx[0][m] + best / 2;
-                    int m2 = bestIdx[0][m] + (best - 1) / 2;
-                    int result1 = findBestOwnerHouse(bestIdx[0][m], m1, bestIdx[1][m]);
-                    int result2 = findBestOwnerHouse(bestIdx[0][m], m2, bestIdx[1][m]);
-                    result = Math.min(result1, result2);
-                } else {
-                    int m1 = bestIdx[0][m] + best / 2;
-                    result = findBestOwnerHouse(bestIdx[0][m], m1, bestIdx[1][m]);
+                int bestOwnerRoom = bestIdx[0][m];
+                while (Math.max(bestOwnerRoom - bestIdx[0][m], bestIdx[1][m] - bestOwnerRoom)
+                        > Math.max(nextEmptyRoom(bestOwnerRoom) - bestIdx[0][m], bestIdx[1][m] - nextEmptyRoom(bestOwnerRoom))) {
+                    bestOwnerRoom = nextEmptyRoom(bestOwnerRoom);
                 }
-                fresult = Math.min(result, fresult);
+                fresult = Math.min(Math.max(bestOwnerRoom - bestIdx[0][m], bestIdx[1][m] - bestOwnerRoom), fresult);
             }
         }
         fresult = fresult == MAX_VALUE ? 1 : fresult;
         System.out.println(fresult);
     }
 
-    private int findBestOwnerHouse(int start, int mid, int end) {
-        int i = mid;
-        int j = mid;
-
-        while (i <= end && input[i] == 1) {
-            i++;
-        }
-
-        while (j >= start && input[j] == 1) {
-            j--;
-        }
-
-        return Math.min(Math.max(i - start, end - i), Math.max(j - start, end - j));
+    private int nextEmptyRoom(int fromIdx) {
+        do {
+            fromIdx++;
+        } while (fromIdx < n && input[fromIdx] == 1);
+        return fromIdx;
     }
 
     public static void main(String[] args) {
