@@ -49,117 +49,6 @@ public class HostnameAliases {
         }
     }
 
-    class LinkListSt {
-
-        private int N;
-        private Node first;
-
-        class Node {
-
-            private String key;
-            private Node next;
-
-            Node(String key, Node next) {
-                this.key = key;
-                this.next = next;
-            }
-        }
-
-        int size() {
-            return N;
-        }
-
-        Node get(String key) {
-            if (key == null || key.isEmpty()) {
-                return null;
-            }
-
-            for (Node p = first; p != null; p = p.next) {
-                if (p.key.equals(key)) {
-                    return p;
-                }
-            }
-            return null;
-        }
-
-        boolean put(String key) {
-            if (key == null || key.isEmpty()) {
-                return false;
-            }
-
-            for (Node p = first; p != null; p = p.next) {
-                if (key.equals(p.key)) {
-                    return false;
-                }
-            }
-
-            first = new Node(key, first);
-            N++;
-            return true;
-        }
-
-        String[] keys() {
-            String[] allKeys = new String[N];
-            int i = 0;
-            for (Node x = first; x != null; x = x.next) {
-                allKeys[i++] = x.key;
-            }
-            return allKeys;
-        }
-    }
-
-    class HashSt {
-
-        private int N;
-        private int M;
-        private LinkListSt[] st;
-
-        HashSt(int capacity) {
-            M = capacity;
-            st = new LinkListSt[M];
-            for (int i = 0; i < M; i++) {
-                st[i] = new LinkListSt();
-            }
-        }
-
-        int size() {
-            return N;
-        }
-
-        int hash(String key) {
-            return (key.hashCode() & 0x7fffffff) % M;
-        }
-
-        boolean contains(String key) {
-            if (key == null || key.isEmpty()) {
-                return false;
-            }
-            int i = hash(key);
-            return st[i].get(key) != null;
-        }
-
-        void put(String key) {
-            if (key == null || key.isEmpty()) {
-                return;
-            }
-            int i = hash(key);
-            if (st[i].put(key)) {
-                N++;
-            }
-        }
-
-        String[] keys() {
-            String[] allKeys = new String[N];
-            int ptr = 0;
-            for (int i = 0; i < st.length; i++) {
-                for (String key : st[i].keys()) {
-                    allKeys[ptr++] = key;
-                }
-            }
-            return allKeys;
-        }
-    }
-
     class RbTree {
 
         private static final boolean RED = true;
@@ -169,42 +58,26 @@ public class HostnameAliases {
         class Node {
 
             private String key;
-            private Integer value;
             private Node left, right;
             private boolean color;
+            private int sz;
 
-            Node(String key, Integer value, boolean color) {
+            Node(String key, boolean color) {
                 this.key = key;
-                this.value = value;
                 this.color = color;
+                this.sz = 1;
             }
         }
 
-        private Integer get(String key) {
-            Node x = get(root, key);
+        private int size() {
+            return size(root);
+        }
+
+        private int size(Node x) {
             if (x == null) {
-                return null;
+                return 0;
             }
-            return x.value;
-        }
-
-        private Node get(Node x, String key) {
-            if (x == null) {
-                return null;
-            }
-            int cmp = key.compareTo(x.key);
-            if (cmp < 0) {
-                return get(x.left, key);
-            } else if (cmp > 0) {
-                return get(x.right, key);
-            } else {
-                return x;
-            }
-        }
-
-        private void put(String key, Integer value) {
-            root = put(root, key, value);
-            root.color = BLACK;
+            return x.sz;
         }
 
         private boolean isRed(Node x) {
@@ -220,6 +93,8 @@ public class HostnameAliases {
             x.left = h;
             x.color = h.color;
             h.color = RED;
+            x.sz = h.sz;
+            h.sz = 1 + size(h.left) + size(h.right);
             return x;
         }
 
@@ -229,6 +104,8 @@ public class HostnameAliases {
             x.right = h;
             x.color = h.color;
             h.color = RED;
+            x.sz = h.sz;
+            h.sz = 1 + size(h.left) + size(h.right);
             return x;
         }
 
@@ -238,15 +115,20 @@ public class HostnameAliases {
             h.right.color = !h.right.color;
         }
 
-        private Node put(Node x, String key, Integer value) {
+        private void put(String key) {
+            root = put(root, key);
+            root.color = BLACK;
+        }
+
+        private Node put(Node x, String key) {
             if (x == null) {
-                return new Node(key, value, RED);
+                return new Node(key, RED);
             }
             int cmp = key.compareTo(x.key);
             if (cmp < 0) {
-                x.left = put(x.left, key, value);
+                x.left = put(x.left, key);
             } else if (cmp > 0) {
-                x.right = put(x.right, key, value);
+                x.right = put(x.right, key);
             } else {
             }
 
@@ -259,17 +141,54 @@ public class HostnameAliases {
             if (isRed(x.left) && isRed(x.right)) {
                 flipColors(x);
             }
+            x.sz = 1 + size(x.left) + size(x.right);
             return x;
+        }
+
+        private int rank(String key) {
+            return rank(root, key);
+        }
+
+        private int rank(Node x, String key) {
+            if (x == null) {
+                return 0;
+            }
+            int cmp = key.compareTo(x.key);
+            if (cmp < 0) {
+                return rank(x.left, key);
+            } else if (cmp > 0) {
+                return 1 + size(x.left) + rank(x.right, key);
+            } else {
+                return size(x.left);
+            }
+        }
+
+        private String select(int rank) {
+            return select(root, rank);
+        }
+
+        private String select(Node x, Integer rank) {
+            if (x == null) {
+                return null;
+            }
+            int cmp = rank.compareTo(size(x.left));
+            if (cmp < 0) {
+                return select(x.left, rank);
+            } else if (cmp > 0) {
+                return select(x.right, rank - 1 - size(x.left));
+            } else {
+                return x.key;
+            }
         }
     }
 
     class Tst {
 
+        private int capacity;
         private Node root;
-        private int hshStSz;
 
-        Tst(int hshStSz) {
-            this.hshStSz = hshStSz;
+        Tst(int capacity) {
+            this.capacity = capacity;
         }
 
         class Node {
@@ -278,18 +197,19 @@ public class HostnameAliases {
             private Node l;
             private Node m;
             private Node r;
-            private HashSt set;
+            private int[] serverRankIdx;
+            private int ptr;
 
             Node(char c) {
                 this.c = c;
             }
         }
 
-        private void put(String key, String value) {
+        private void put(String key, int value) {
             root = put(root, key, value, 0);
         }
 
-        private Node put(Node x, String key, String value, int d) {
+        private Node put(Node x, String key, int value, int d) {
             char e = key.charAt(d);
             if (x == null) {
                 x = new Node(e);
@@ -301,67 +221,65 @@ public class HostnameAliases {
             } else if (d < key.length() - 1) {
                 x.m = put(x.m, key, value, d + 1);
             } else {
-                if (x.set == null) {
-                    x.set = new HashSt(hshStSz);
+                if (x.serverRankIdx == null) {
+                    x.serverRankIdx = new int[capacity];
                 }
-                x.set.put(value);
+                x.serverRankIdx[x.ptr++] = value;
             }
             return x;
         }
 
-        private String[] getValuesForKeys(String prefix) {
-            Node x = get(prefix);
-            if (x != null && x.set != null) {
-                return x.set.keys();
-            }
-            return null;
+        private Node getValuesForKeys(String key) {
+            return get(root, key, 0);
         }
 
-        private Node get(String prefix) {
-            return get(root, prefix, 0);
-        }
-
-        private Node get(Node x, String prefix, int d) {
+        private Node get(Node x, String key, int d) {
             if (x == null) {
                 return null;
             }
-            char m = prefix.charAt(d);
+            char m = key.charAt(d);
             if (x.c > m) {
-                return get(x.l, prefix, d);
+                return get(x.l, key, d);
             } else if (x.c < m) {
-                return get(x.r, prefix, d);
-            } else if (d < prefix.length() - 1) {
-                return get(x.m, prefix, d + 1);
+                return get(x.r, key, d);
+            } else if (d < key.length() - 1) {
+                return get(x.m, key, d + 1);
             } else {
                 return x;
             }
         }
     }
 
-    class Trie {
+    class BinaryTrie {
 
         private static final int R = 2;
         private Node root;
+        private int capacity;
+
+        BinaryTrie(int capacity) {
+            this.capacity = capacity;
+        }
 
         class Node {
 
-            private LinkListSt lst;
+            private int[] serverRankIdx;
+            private int ptr;
             private Node[] next = new Node[R];
         }
 
-        private void insert(String bitString, String value) {
+        private void insert(String bitString, int value) {
             root = insert(root, bitString, value, 0);
         }
 
-        private Node insert(Node x, String bitString, String value, int d) {
+        private Node insert(Node x, String bitString, int value, int d) {
             if (x == null) {
                 x = new Node();
             }
-            if (d == bitString.length() - 1) {
-                if (x.lst == null) {
-                    x.lst = new LinkListSt();
+            if (d == bitString.length()) {
+                if (x.serverRankIdx == null) {
+                    x.serverRankIdx = new int[capacity];
                 }
-                x.lst.put(value);
+                x.serverRankIdx[x.ptr++] = value;
                 return x;
             }
             if (bitString.charAt(d) == '0') {
@@ -372,36 +290,15 @@ public class HostnameAliases {
             return x;
         }
 
-        private String[] get(String bitString) {
-            String[] result = null;
-            Node x = get(root, bitString, 0);
-            if (x != null && x.lst != null) {
-                result = x.lst.keys();
-            }
-            return result;
-        }
-
-        private varArrOfStr collectAllGroupsWithMoreThanOneElem(HashSt binaryKey, int serversLength) {
-            String[] binString = binaryKey.keys();
-            varArrOfStr result = new varArrOfStr(binString.length, serversLength);
-            for (int i = 0; i < binString.length; i++) {
-                String[] servers = get(binString[i]);
-                if (servers != null && servers.length > 1) {
-                    for (int j = 0; j < servers.length; j++) {
-                        result.addKey(servers[j]);
-                        result.nextCol();
-                    }
-                    result.nextRow();
-                }
-            }
-            return result;
+        private Node get(String bitString) {
+            return get(root, bitString, 0);
         }
 
         private Node get(Node x, String bitString, int d) {
             if (x == null) {
                 return null;
             }
-            if (d == bitString.length() - 1) {
+            if (d == bitString.length()) {
                 return x;
             }
             if (bitString.charAt(d) == '0') {
@@ -410,28 +307,33 @@ public class HostnameAliases {
                 return get(x.next[1], bitString, d + 1);
             }
         }
+
+        private void collect(Output o) {
+            collect(root, o);
+        }
+
+        private void collect(Node x, Output o) {
+            if (x == null) {
+                return;
+            }
+            collect(x.next[0], o);
+            if (x.ptr > 1) {
+                o.addKeys(x.serverRankIdx, x.ptr);
+            }
+            collect(x.next[1], o);
+        }
     }
 
-    class varArrOfStr {
+    class Output {
 
-        private String[][] data;
+        private int[][] data;
         private int rowIdx;
         private int colIdx;
+        private RbTree rbTree;
 
-        varArrOfStr(int rcapacity, int ccapacity) {
-            data = new String[rcapacity][ccapacity];
-        }
-
-        void addKey(String key) {
-            data[rowIdx][colIdx] = key;
-        }
-
-        void nextRow() {
-            rowIdx++;
-        }
-
-        void nextCol() {
-            colIdx++;
+        Output(RbTree rbTree) {
+            this.rbTree = rbTree;
+            data = new int[rbTree.size()][rbTree.size()];
         }
 
         @Override
@@ -441,9 +343,9 @@ public class HostnameAliases {
             sb.append("\n");
             for (int i = 0; i < rowIdx; i++) {
                 for (int j = 0; j < colIdx; j++) {
-                    if (data[i][j] != null) {
+                    if (data[i][j] > 0) {
                         sb.append("http://");
-                        sb.append(data[i][j]);
+                        sb.append(rbTree.select(data[i][j] - 1));
                         sb.append(" ");
                     }
                 }
@@ -451,66 +353,75 @@ public class HostnameAliases {
             }
             return sb.toString();
         }
+
+        private void addKeys(int[] serverRankIdx, int ptr) {
+            for (int i = 0; i < ptr; i++) {
+                data[rowIdx][colIdx++] = serverRankIdx[i];
+            }
+            rowIdx++;
+        }
     }
 
     private int n;
+
+    private String getPath(String x) {
+        return x.indexOf('/') == -1 ? "#" : x.substring(x.indexOf('/'));
+    }
+
+    private String getServer(String x) {
+        return x.indexOf('/') == -1 ? x.substring(0, x.length()) : x.substring(0, x.indexOf('/'));
+    }
 
     private void compute() {
         //InputReader sc = new InputReader(System.in);
         InputReader sc = null;
         try {
-            sc = new InputReader(new FileInputStream("./resources/hostnamealiases"));
+            sc = new InputReader(new FileInputStream("./resources/hostnamealiases2"));
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
         n = sc.nextInt();
-        Tst tst = new Tst(n);
-        HashSt pathst = new HashSt(n);
-        HashSt serverst = new HashSt(n);
-        RbTree sreverIdx = new RbTree();
+        RbTree severTree = new RbTree();
+        RbTree pathTree = new RbTree();
+        RbTree input = new RbTree();
+
         for (int i = 0; i < n; i++) {
-            String a = sc.readNext().substring(7);
-            String server = a.indexOf('/') == -1 ? a.substring(0, a.length()) : a.substring(0, a.indexOf('/'));
-            String path = a.indexOf('/') == -1 ? "#" : a.substring(a.indexOf('/'));
-            serverst.put(server);
-            pathst.put(path);
-            tst.put(path, server);
-        }
-        int[][] result = new int[serverst.size()][pathst.size()];
-        String[] servers = serverst.keys();
-        String[] paths = pathst.keys();
-        for (int i = 0; i < servers.length; i++) {
-            sreverIdx.put(servers[i], i);
+            String fullPath = sc.readNext().substring(7);
+            input.put(fullPath);
+            severTree.put(getServer(fullPath));
+            pathTree.put(getPath(fullPath));
         }
 
-        for (int j = 0; j < paths.length; j++) {
-            String[] serverGroups = tst.getValuesForKeys(paths[j]);
-            if (serverGroups != null) {
-                for (int k = 0; k < serverGroups.length; k++) {
-                    result[sreverIdx.get(serverGroups[k])][j] = 1;
+        Tst tst = new Tst(severTree.size());
+        for (int i = 0; i < input.size(); i++) {
+            tst.put(getPath(input.select(i)), severTree.rank(getServer(input.select(i))));
+        }
+
+        input = null;
+        System.gc();
+
+        byte[][] adjMatrix = new byte[severTree.size()][pathTree.size()];
+        for (int j = 0; j < pathTree.size(); j++) {
+            Tst.Node serverRanks = tst.getValuesForKeys(pathTree.select(j));
+            if (serverRanks != null) {
+                for (int i = 0; i < serverRanks.ptr; i++) {
+                    adjMatrix[serverRanks.serverRankIdx[i]][j] = 1;
                 }
             }
         }
 
-        Trie trie = new Trie();
-        HashSt binaryKey = new HashSt(result.length);
-        for (int i = 0; i < result.length; i++) {
+        BinaryTrie trie = new BinaryTrie(severTree.size());
+        for (int i = 0; i < severTree.size(); i++) {
             StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < result[i].length; j++) {
-                sb.append(result[i][j]);
+            for (int j = 0; j < pathTree.size(); j++) {
+                sb.append(adjMatrix[i][j]);
             }
-            trie.insert(sb.toString(), servers[i]);
-            binaryKey.put(sb.toString());
+            trie.insert(sb.toString(), i + 1);
         }
 
-        varArrOfStr output = trie.collectAllGroupsWithMoreThanOneElem(binaryKey, servers.length);
+        Output output = new Output(severTree);
+        trie.collect(output);
         System.out.println(output.toString());
-    }
-
-    private void printArr(String[] arr) {
-        for (String x : arr) {
-            System.out.println(x);
-        }
     }
 
     public static void main(String... args) {
