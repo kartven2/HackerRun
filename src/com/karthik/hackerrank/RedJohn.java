@@ -72,25 +72,25 @@ public class RedJohn {
         }
     }
 
-    private BigInteger getPrimes(int n) {
+    private BigInteger getPrimes(int number) {
         BigInteger count = BigInteger.ZERO;
-        if (n < 2) {
+        if (number < 2) {
             return BigInteger.ZERO;
         }
-        n = ((n & 1) + n) >> 1;
-        BitSet x = new BitSet(n + 1);
+        number = ((number & 1) + number) >> 1;
+        BitSet x = new BitSet(number + 1);
         int i = 4, p = 3, q = 4;
-        for (; q < n; q += p >> 1 << 2) {
+        for (; q < number; q += p >> 1 << 2) {
             if (!x.get(q)) {
                 x.set(q);
-                for (i = q + p; i < n; i += p) {
+                for (i = q + p; i < number; i += p) {
                     x.set(i);
                 }
             }
             p += 2;
         }
         count = count.add(BigInteger.ONE);
-        for (i = 1; i < n; i++) {
+        for (i = 1; i < number; i++) {
             if (!x.get(i)) {
                 count = count.add(BigInteger.ONE);
             }
