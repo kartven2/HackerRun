@@ -13,7 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -34,11 +38,6 @@ public class VanyaAndTreasure {
             this.x = x;
             this.y = y;
             this.d = d;
-        }
-
-        @Override
-        public String toString() {
-            return "Node{" + "x=" + x + ", y=" + y + ", d=" + d + '}';
         }
 
         @Override
@@ -74,8 +73,7 @@ public class VanyaAndTreasure {
         }
     }
 
-    private Node[][] dp;
-    private int[] sizeof;
+    private Map<Integer, List<Node>> dp;
     private int n;
     private int m;
     private int p;
@@ -91,45 +89,42 @@ public class VanyaAndTreasure {
         n = sc.nextInt();
         m = sc.nextInt();
         p = sc.nextInt();
-        dp = new Node[(n * m) + 1][(n * m) + 1];
-        sizeof = new int[(n * m) + 1];
+        dp = new HashMap<>();
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 int type = sc.nextInt();
                 int d = type == 1 ? (i + j) : MAX;
-                dp[type][sizeof[type]++] = new Node(i, j, d);
+                List<Node> typeList = dp.get(type);
+                if (typeList == null) {
+                    typeList = new ArrayList<>();
+                }
+                typeList.add(new Node(i, j, d));
+                dp.put(type, typeList);
             }
         }
 
         for (int i = 2; i <= p; i++) {
-            Arrays.sort(dp[i], 0, sizeof[i]);
-            int limit = Math.min((n + m), sizeof[i - 1]);
-            for (int j = 0; j < sizeof[i]; j++) {
+            List<Node> typeList = dp.get(i);
+            List<Node> prevTypeList = dp.get(i - 1);
+            Collections.sort(prevTypeList);
+            int limit = Math.min(prevTypeList.size(), m + n);
+            for (int j = 0; j < typeList.size(); j++) {
                 for (int k = 0; k < limit; k++) {
-                    dp[i][j].d = Math.min(dp[i][j].d, dp[i - 1][k].d + dist(i - 1, k, i, j));
+                    typeList.get(j).d = Math.min(typeList.get(j).d, prevTypeList.get(k).d + dist(prevTypeList.get(k), typeList.get(j)));
                 }
             }
         }
 
-        //printArray();
         int result = MAX;
-        for (int i = 0; i < sizeof[p]; i++) {
-            result = Math.min(result, dp[p][i].d);
+        List<Node> resultrow = dp.get(p);
+        for (int i = 0; i < resultrow.size(); i++) {
+            result = Math.min(result, resultrow.get(i).d);
         }
         System.out.println(result);
     }
 
-    private int dist(int a, int b, int c, int d) {
-        return Math.abs(dp[a][b].x - dp[c][d].x) + Math.abs(dp[a][b].y - dp[c][d].y);
-    }
-
-    private void printArray() {
-        for (int i = 0; i <= p; i++) {
-            for (int j = 0; j < sizeof[i]; j++) {
-                System.out.print(dp[i][j] + " ");
-            }
-            System.out.println();
-        }
+    private int dist(Node a, Node b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
     public static void main(String... args) {
