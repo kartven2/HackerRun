@@ -47,32 +47,41 @@ public class HeapOperations {
                     break;
                 case "getMin":
                     int minValue = sc.nextInt();
-                    int heapValue = mh.min();
-                    if (heapValue == minValue) {
-                        opList.add(command + " " + minValue);
-                    } else if (heapValue < minValue) {
-                        while (heapValue > -1 && heapValue < minValue) {
-                            opList.add("removeMin");
-                            mh.removeMin();
-                            heapValue = mh.min();
-                        }
-                        if (heapValue == -1 || heapValue > minValue) {
+                    if (!mh.isEmpty()) {
+                        int heapValue = mh.min();
+                        if (heapValue == minValue) {
+                            opList.add(command + " " + minValue);
+                        } else if (heapValue < minValue) {
+                            while (heapValue < minValue) {
+                                opList.add("removeMin");
+                                mh.removeMin();
+                                if (mh.isEmpty()) {
+                                    break;
+                                } else {
+                                    heapValue = mh.min();
+                                }
+                            }
+                            if (mh.isEmpty() || heapValue > minValue) {
+                                mh.insert(minValue);
+                                opList.add("insert " + minValue);
+                                opList.add(command + " " + minValue);
+                            } else if (heapValue == minValue) {
+                                opList.add(command + " " + minValue);
+                            }
+                        } else if (heapValue > minValue) {
                             mh.insert(minValue);
                             opList.add("insert " + minValue);
                             opList.add(command + " " + minValue);
-                        } else if (heapValue == minValue) {
-                            opList.add(command + " " + minValue);
                         }
-                    } else if (heapValue > minValue) {
+                    } else {
                         mh.insert(minValue);
                         opList.add("insert " + minValue);
                         opList.add(command + " " + minValue);
                     }
                     break;
                 case "removeMin":
-                    int heapEntry = mh.min();
-                    if (heapEntry == -1) {
-                        opList.add("insert " + 1);
+                    if (mh.isEmpty()) {
+                        opList.add("insert -1000000000");
                     } else {
                         mh.removeMin();
                     }
@@ -173,23 +182,16 @@ public class HeapOperations {
         }
 
         private int min() {
-            if (N == 0) {
-                return -1;
-            }
             return heap[1];
         }
 
         private int removeMin() {
-            if (N == 0) {
-                return -1;
-            }
             int x = heap[1];
             exchange(1, N);
             heap[N--] = 0;
             sink(1);
             return x;
         }
-
     }
 
     public static void main(String... args) {
