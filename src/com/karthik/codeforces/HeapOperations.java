@@ -15,8 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -33,8 +31,9 @@ public class HeapOperations {
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
-        MinHeap mh = new MinHeap((int) 1e6 + 1);
-        List<String> opList = new ArrayList<>();
+        MinHeap mh = new MinHeap((int) (1e5 + 2));
+        long count = 0;
+        StringBuilder sb = new StringBuilder();
         int ops = sc.nextInt();
         while (ops-- > 0) {
             String command = sc.readNext();
@@ -42,40 +41,40 @@ public class HeapOperations {
                 case "insert":
                     int y = sc.nextInt();
                     mh.insert(y);
-                    opList.add(command + " " + y);
+                    sb.append(command).append(" ").append(y).append("\n");
+                    count++;
                     break;
                 case "getMin":
                     int x = sc.nextInt();
                     while (!mh.isEmpty() && mh.min() < x) {
-                        opList.add("removeMin");
+                        sb.append("removeMin\n");
+                        count++;
                         mh.removeMin();
                     }
                     if (mh.isEmpty() || mh.min() > x) {
-                        opList.add("insert " + x);
+                        sb.append("insert").append(" ").append(x).append("\n");
+                        count++;
                         mh.insert(x);
                     }
-                    opList.add(command + " " + x);
+                    sb.append(command).append(" ").append(x).append("\n");
+                    count++;
                     break;
                 case "removeMin":
                     if (mh.isEmpty()) {
-                        opList.add("insert 0");
+                        sb.append("insert 0\n");
+                        count++;
                     } else {
                         mh.removeMin();
                     }
-                    opList.add(command);
+                    sb.append(command).append("\n");
+                    count++;
                     break;
                 default:
                     break;
             }
         }
-        printOutput(opList);
-    }
-
-    private void printOutput(List<String> opList) {
-        System.out.println(opList.size());
-        for (String x : opList) {
-            System.out.println(x);
-        }
+        System.out.println(count);
+        System.out.println(sb.toString());
     }
 
     class InputReader {
