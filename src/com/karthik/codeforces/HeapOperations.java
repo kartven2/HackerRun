@@ -33,55 +33,32 @@ public class HeapOperations {
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
-
-        MinHeap mh = new MinHeap((int) 1e5 + 1);
+        MinHeap mh = new MinHeap((int) 1e6 + 1);
         List<String> opList = new ArrayList<>();
         int ops = sc.nextInt();
         while (ops-- > 0) {
             String command = sc.readNext();
             switch (command) {
                 case "insert":
-                    int value = sc.nextInt();
-                    mh.insert(value);
-                    opList.add(command + " " + value);
+                    int y = sc.nextInt();
+                    mh.insert(y);
+                    opList.add(command + " " + y);
                     break;
                 case "getMin":
-                    int minValue = sc.nextInt();
-                    if (!mh.isEmpty()) {
-                        int heapValue = mh.min();
-                        if (heapValue == minValue) {
-                            opList.add(command + " " + minValue);
-                        } else if (heapValue < minValue) {
-                            while (heapValue < minValue) {
-                                opList.add("removeMin");
-                                mh.removeMin();
-                                if (mh.isEmpty()) {
-                                    break;
-                                } else {
-                                    heapValue = mh.min();
-                                }
-                            }
-                            if (mh.isEmpty() || heapValue > minValue) {
-                                mh.insert(minValue);
-                                opList.add("insert " + minValue);
-                                opList.add(command + " " + minValue);
-                            } else if (heapValue == minValue) {
-                                opList.add(command + " " + minValue);
-                            }
-                        } else if (heapValue > minValue) {
-                            mh.insert(minValue);
-                            opList.add("insert " + minValue);
-                            opList.add(command + " " + minValue);
-                        }
-                    } else {
-                        mh.insert(minValue);
-                        opList.add("insert " + minValue);
-                        opList.add(command + " " + minValue);
+                    int x = sc.nextInt();
+                    while (!mh.isEmpty() && mh.min() < x) {
+                        opList.add("removeMin");
+                        mh.removeMin();
                     }
+                    if (mh.isEmpty() || mh.min() > x) {
+                        opList.add("insert " + x);
+                        mh.insert(x);
+                    }
+                    opList.add(command + " " + x);
                     break;
                 case "removeMin":
                     if (mh.isEmpty()) {
-                        opList.add("insert -1000000000");
+                        opList.add("insert 0");
                     } else {
                         mh.removeMin();
                     }
@@ -137,16 +114,12 @@ public class HeapOperations {
             heap[0] = -1;
         }
 
-        private int size() {
-            return N;
-        }
-
         private boolean isEmpty() {
             return N == 0;
         }
 
         private void sink(int k) {
-            while (2 * k < N) {
+            while (2 * k <= N) {
                 int j = 2 * k;
                 if (j < N && less(j + 1, j)) {
                     j++;
