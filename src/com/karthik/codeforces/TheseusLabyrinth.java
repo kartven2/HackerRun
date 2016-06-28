@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -23,268 +21,228 @@ import java.util.StringTokenizer;
  */
 public class TheseusLabyrinth {
 
-    private int[][] vertexType;
+    private static final String TOP = "+|^LRD";
+    private static final String BOTTOM = "+|vLRU";
+    private static final String LEFT = "+-<RUD";
+    private static final String RIGHT = "+->LUD";
+
+    private int n;
+    private int m;
+    private char[][][] vertexType;
+    private boolean[][][] marked;
+
+    class Coord {
+
+        private int x;
+        private int y;
+        private int orientation;
+        private int distance;
+
+        Coord(int x, int y, int orientation, int distance) {
+            this.x = x;
+            this.y = y;
+            this.orientation = orientation;
+            this.distance = distance;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 11 * hash + this.x;
+            hash = 11 * hash + this.y;
+            hash = 11 * hash + this.orientation;
+            hash = 11 * hash + this.distance;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Coord other = (Coord) obj;
+            if (this.x != other.x) {
+                return false;
+            }
+            if (this.y != other.y) {
+                return false;
+            }
+            if (this.orientation != other.orientation) {
+                return false;
+            }
+            if (this.distance != other.distance) {
+                return false;
+            }
+            return true;
+        }
+    }
 
     private void compute() {
         //InputReader sc = new InputReader(System.in);
         InputReader sc = null;
         try {
-            sc = new InputReader(new FileInputStream("./resources/theseuslabyrinth4"));
+            sc = new InputReader(new FileInputStream("./resources/theseuslabyrinth2"));
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
-        int n = sc.nextInt();
-        int m = sc.nextInt();
-        vertexType = new int[n + 1][m + 1];
+        n = sc.nextInt();
+        m = sc.nextInt();
+        vertexType = new char[n][m][4];
+        marked = new boolean[n][m][4];
 
-        for (int i = 1; i <= n; i++) {
-            String line = sc.readNext();
-            char[] chars = line.toCharArray();
-            for (int j = 1; j <= m; j++) {
-                vertexType[i][j] = getType(chars[j - 1]);
+        for (int i = 0; i < n; i++) {
+            char[] chars = sc.readNext().toCharArray();
+            for (int j = 0; j < m; j++) {
+                vertexType[i][j][0] = chars[j];
+                for (int k = 1; k < 4; k++) {
+                    switch (vertexType[i][j][k - 1]) {
+                        case '+':
+                            vertexType[i][j][k] = '+';
+                            break;
+                        case '-':
+                            vertexType[i][j][k] = '|';
+                            break;
+                        case '|':
+                            vertexType[i][j][k] = '-';
+                            break;
+                        case '^':
+                            vertexType[i][j][k] = '>';
+                            break;
+                        case '>':
+                            vertexType[i][j][k] = 'v';
+                            break;
+                        case '<':
+                            vertexType[i][j][k] = '^';
+                            break;
+                        case 'v':
+                            vertexType[i][j][k] = '<';
+                            break;
+                        case 'L':
+                            vertexType[i][j][k] = 'U';
+                            break;
+                        case 'R':
+                            vertexType[i][j][k] = 'D';
+                            break;
+                        case 'U':
+                            vertexType[i][j][k] = 'R';
+                            break;
+                        case 'D':
+                            vertexType[i][j][k] = 'L';
+                            break;
+                        case '*':
+                            vertexType[i][j][k] = '*';
+                            break;
+                        default:
+                            throw new IllegalArgumentException("invalid input");
+                    }
+                }
             }
         }
 
-        Graph g = new Graph(n, m, sc.nextInt(), sc.nextInt(), sc.nextInt(), sc.nextInt());
-        g.addEdges();
-        //g.printArray();
-        int output = g.djikstraSp() ? g.simulate() : -1;
-        System.out.println(output);
+        Graph g = new Graph(new Coord(sc.nextInt() - 1, sc.nextInt() - 1, 0, 0),
+                new Coord(sc.nextInt() - 1, sc.nextInt() - 1, 0, 0));
+        g.simulate();
     }
 
     class Graph {
 
-        private static final int MAX = Integer.MAX_VALUE;
-        private int n;
-        private int m;
-        private int V;
-        private List<Integer>[] adj;
-        private int source;
-        private int dest;
-        private int[][] weight;
-        private int[] distTo;
-        private int[] edgeTo;
-        private IndexMinPQ<Integer> pq;
+        private Coord source;
+        private Coord dest;
 
-        Graph(int n, int m, int sx, int sy, int dx, int dy) {
-            this.n = n;
-            this.m = m;
-            source = getIdx(sx, sy);
-            dest = getIdx(dx, dy);
+        Graph(Coord source, Coord dest) {
             if (source == dest) {
                 System.out.println(0);
                 System.exit(0);
             }
-            V = (n * m);
-            weight = new int[V + 1][V + 1];
-            adj = new ArrayList[V + 1];
-            distTo = new int[V + 1];
-            edgeTo = new int[V + 1];
-            for (int v = 1; v <= V; v++) {
-                adj[v] = new ArrayList<>();
-                distTo[v] = MAX;
-            }
-            distTo[source] = 0;
+            this.source = source;
+            this.dest = dest;
         }
 
-        private int getIdx(int x, int y) {
-            return (x - 1) * m + y;
-        }
+        private void simulate() {
+            SimpleQueue<Coord> q = new SimpleQueue<>();
+            q.add(source);
+            while (!q.isEmpty()) {
+                Coord v = q.remove();
 
-        private void cheapestEdge(int v, int sx, int sy, int dx, int dy, int wpos) {
-            int w = getIdx(dx, dy);
-            int vtype = vertexType[sx][sy];
-            int wtype = vertexType[dx][dy];
-            int cost = 0;
-            boolean isReachable = false;
-            for (int k = 1; k <= 4; k++) {
-                switch (wpos) {
-                    case 1:
-                        isReachable = (vtype & 8) == 8 && (wtype & 2) == 2;
-                        break;
-                    case 2:
-                        isReachable = (vtype & 4) == 4 && (wtype & 1) == 1;
-                        break;
-                    case 3:
-                        isReachable = (vtype & 2) == 2 && (wtype & 8) == 8;
-                        break;
-                    case 4:
-                        isReachable = (vtype & 1) == 1 && (wtype & 4) == 4;
-                        break;
+                if (marked[v.x][v.y][v.orientation]) {
+                    continue;
                 }
-                if (isReachable) {
-                    cost++;
-                    break;
+
+                marked[v.x][v.y][v.orientation] = true;
+
+                if (v.x == dest.x && v.y == dest.y) {
+                    System.out.println(v.distance);
+                    System.exit(0);
                 }
-                vtype = (vtype >>> 1) | (vtype << (4 - 1));
-                int tmp = vtype >>> 4;
-                tmp = tmp << 4;
-                vtype = vtype ^ tmp;
-                wtype = (wtype >>> 1) | (wtype << (4 - 1));
-                tmp = wtype >>> 4;
-                tmp = tmp << 4;
-                wtype = wtype ^ tmp;
-                cost++;
-            }
-            if (isReachable) {
-                weight[v][w] = cost;
-                adj[v].add(w);
-            }
-        }
 
-        private void addEdges() {
-            for (int i = 1; i <= n; i++) {
-                for (int j = 1; j <= m; j++) {
-                    int v = getIdx(i, j);
+                if (!marked[v.x][v.y][(v.orientation + 1) % 4]) {
+                    q.add(new Coord(v.x, v.y, (v.orientation + 1) % 4, v.distance + 1));
+                }
 
-                    if ((i - 1) > 0) {
-                        cheapestEdge(v, i, j, i - 1, j, 1);
-                    }
+                if (v.x - 1 >= 0 && !marked[v.x - 1][v.y][v.orientation]
+                        && TOP.indexOf(vertexType[v.x][v.y][v.orientation]) != -1
+                        && BOTTOM.indexOf(vertexType[v.x - 1][v.y][v.orientation]) != -1) {
+                    q.add(new Coord(v.x - 1, v.y, v.orientation, v.distance + 1));
+                }
 
-                    if ((j - 1) > 0) {
-                        cheapestEdge(v, i, j, i, j - 1, 4);
-                    }
+                if (v.x + 1 < n && !marked[v.x + 1][v.y][v.orientation]
+                        && BOTTOM.indexOf(vertexType[v.x][v.y][v.orientation]) != -1
+                        && TOP.indexOf(vertexType[v.x + 1][v.y][v.orientation]) != -1) {
+                    q.add(new Coord(v.x + 1, v.y, v.orientation, v.distance + 1));
+                }
 
-                    if ((i + 1) <= n) {
-                        cheapestEdge(v, i, j, i + 1, j, 3);
-                    }
+                if (v.y - 1 >= 0 && !marked[v.x][v.y - 1][v.orientation]
+                        && LEFT.indexOf(vertexType[v.x][v.y][v.orientation]) != -1
+                        && RIGHT.indexOf(vertexType[v.x][v.y - 1][v.orientation]) != -1) {
+                    q.add(new Coord(v.x, v.y - 1, v.orientation, v.distance + 1));
+                }
 
-                    if ((j + 1) <= m) {
-                        cheapestEdge(v, i, j, i, j + 1, 2);
-                    }
+                if (v.y + 1 < m && !marked[v.x][v.y + 1][v.orientation]
+                        && RIGHT.indexOf(vertexType[v.x][v.y][v.orientation]) != -1
+                        && LEFT.indexOf(vertexType[v.x][v.y + 1][v.orientation]) != -1) {
+                    q.add(new Coord(v.x, v.y + 1, v.orientation, v.distance + 1));
                 }
             }
-        }
-
-        private void printArray() {
-            for (int i = 1; i <= V; i++) {
-                for (int j = 1; j <= V; j++) {
-                    System.out.print(weight[i][j] + " ");
-                }
-                System.out.println();
-            }
-        }
-
-        private boolean djikstraSp() {
-            pq = new IndexMinPQ<>(V);
-            pq.insert(source, distTo[source]);
-            while (!pq.isEmpty()) {
-                int v = pq.delMin();
-                for (int w : adj[v]) {
-                    if (distTo[w] > distTo[v] + weight[v][w]) {
-                        distTo[w] = distTo[v] + weight[v][w];
-                        edgeTo[w] = v;
-                        if (!pq.contains(w)) {
-                            pq.insert(w, distTo[w]);
-                        } else {
-                            pq.decreaseKey(w, distTo[w]);
-                        }
-                    }
-                }
-            }
-            return distTo[dest] < MAX;
-        }
-
-        private int simulate() {
-            int[] path = new int[V];
-            int pathPtr = 0;
-            for (int x = dest; x != source; x = edgeTo[x]) {
-                path[pathPtr++] = x;
-            }
-            int count = weight[source][path[pathPtr - 1]];
-            int noOfRot = count - 1;
-            while (pathPtr > 1) {
-                int v = path[--pathPtr];
-                int w = path[pathPtr - 1];
-                int effortToMoveToW = weight[v][w] - noOfRot;
-                noOfRot += (effortToMoveToW - 1);
-                noOfRot %= 4;
-                count += effortToMoveToW;
-            }
-            return count;
+            System.out.println(-1);
+            System.exit(0);
         }
     }
 
-    class IndexMinPQ<Key extends Comparable<Key>> {
+    class SimpleQueue<Key> {
 
-        private int maxN;
-        private int N;
-        private int[] pq;
-        private int[] qp;
-        private Key[] keys;
+        private Key[] q;
+        private int size;
+        private int first;
+        private int last;
 
-        IndexMinPQ(int maxN) {
-            this.maxN = maxN;
-            keys = (Key[]) new Comparable[maxN + 1];
-            pq = new int[maxN + 1];
-            qp = new int[maxN + 1];
-            for (int i = 0; i < qp.length; i++) {
-                qp[i] = -1;
-            }
+        SimpleQueue() {
+            q = (Key[]) new Object[n * m * 4];
+            size = first = last = 0;
         }
 
         private boolean isEmpty() {
-            return N == 0;
+            return size == 0;
         }
 
-        private boolean contains(int i) {
-            return qp[i] != -1;
-        }
-
-        private void insert(int i, Key key) {
-            N++;
-            qp[i] = N;
-            pq[N] = i;
-            keys[i] = key;
-            swim(N);
-        }
-
-        private void swim(int k) {
-            while (k > 1 && greater(k / 2, k)) {
-                exchange(k, k / 2);
-                k = k / 2;
+        private void add(Key key) {
+            q[last++] = key;
+            size++;
+            if (last == q.length) {
+                last = 0;
             }
         }
 
-        private int delMin() {
-            int min = pq[1];
-            exchange(1, N--);
-            sink(1);
-            keys[min] = null;
-            qp[min] = -1;
-            pq[N + 1] = -1;
-            return min;
-        }
-
-        private void sink(int k) {
-            while (2 * k <= N) {
-                int j = 2 * k;
-                if (j < N && greater(j, j + 1)) {
-                    j++;
-                }
-                if (greater(j, k)) {
-                    break;
-                }
-                exchange(k, j);
-                k = j;
+        private Key remove() {
+            Key key = q[first];
+            q[first++] = null;
+            size--;
+            if (first == q.length) {
+                first = 0;
             }
-        }
-
-        private void decreaseKey(int i, Key key) {
-            keys[i] = key;
-            swim(qp[i]);
-        }
-
-        private boolean greater(int i, int j) {
-            return keys[pq[i]].compareTo(keys[pq[j]]) > 0;
-        }
-
-        private void exchange(int i, int j) {
-            int tmp = pq[i];
-            pq[i] = pq[j];
-            pq[j] = tmp;
-            qp[pq[i]] = i;
-            qp[pq[j]] = j;
+            return key;
         }
     }
 
@@ -306,44 +264,11 @@ public class TheseusLabyrinth {
                     throw new IllegalArgumentException(ex);
                 }
             }
-
             return tokenizer.nextToken();
         }
 
         private int nextInt() {
             return Integer.parseInt(readNext());
-        }
-    }
-
-    private int getType(char c) {
-        //top-right-bottom-left open:1 close:0
-        switch (c) {
-            case '+':
-                return 15;
-            case '-':
-                return 5;
-            case '|':
-                return 10;
-            case '^':
-                return 8;
-            case '>':
-                return 4;
-            case '<':
-                return 1;
-            case 'v':
-                return 2;
-            case 'L':
-                return 14;
-            case 'R':
-                return 11;
-            case 'U':
-                return 7;
-            case 'D':
-                return 13;
-            case '*':
-                return 0;
-            default:
-                throw new IllegalArgumentException("invalid input");
         }
     }
 
