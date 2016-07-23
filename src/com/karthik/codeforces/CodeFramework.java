@@ -15,8 +15,6 @@ import java.util.StringTokenizer;
  */
 public class CodeFramework {
 
-    private InputReader sc;
-
     class InputReader {
 
         private static final int INPUT_KB = 1024;
@@ -48,7 +46,7 @@ public class CodeFramework {
     }
 
     void compute() {
-        sc = new InputReader(System.in);
+        InputReader sc = new InputReader(System.in);
     }
 
     public static void main(String... args) {
