@@ -124,7 +124,7 @@ public class RestoreANumber {
             digitcnt++;
         }
 
-        //Reduce count for digits in cntdigits
+        //Reduce count for digits in digitcnt
         for (; digitcnt > 0; digitcnt /= 10) {
             cntdigits[digitcnt % 10]--;
         }
