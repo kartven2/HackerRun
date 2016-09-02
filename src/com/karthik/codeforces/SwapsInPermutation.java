@@ -8,8 +8,6 @@
 package com.karthik.codeforces;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,16 +23,7 @@ import java.util.StringTokenizer;
 public class SwapsInPermutation {
 
     private static final PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
-    //private static final InputReader sc = new InputReader(System.in);
-    private static InputReader sc = null;
-
-    static {
-        try {
-            sc = new InputReader(new FileInputStream("./resources/swapsinpermutation"));
-        } catch (FileNotFoundException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
+    private static final InputReader sc = new InputReader(System.in);
 
     private static class InputReader {
 
@@ -71,11 +60,11 @@ public class SwapsInPermutation {
         head[x] = ee++;
     }
 
-    private void dfs(int i) {
-        vis[i] = 1;
-        oi[pos] = i;
-        o[pos++] = a[i];
-        for (int x = head[i]; x != -1; x = next[x]) {
+    private void dfs(int v) {
+        vis[v] = 1;
+        oi[pos] = v;
+        o[pos++] = a[v];
+        for (int x = head[v]; x != -1; x = next[x]) {
             int y = edge[x];
             if (vis[y] == 0) {
                 dfs(y);
@@ -92,13 +81,13 @@ public class SwapsInPermutation {
         vis = new int[n + 1];
         ans = new int[n + 1];
         head = new int[n + 1];
-        edge = new int[(int) 2e5 + 9];
-        next = new int[(int) 2e5 + 9];
+        edge = new int[(int) 2e6 + 9];
+        next = new int[(int) 2e6 + 9];
         Arrays.fill(head, -1);
         for (int i = 1; i <= n; i++) {
             a[i] = sc.nextInt();
         }
-        for (int j = 1; j <= m; j++) {
+        for (int i = 1; i <= m; i++) {
             v = sc.nextInt();
             w = sc.nextInt();
             addEdge(v, w);
