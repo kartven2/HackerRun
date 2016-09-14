@@ -22,8 +22,17 @@ public class DivideTwoIntegers {
         if (dividend == Integer.MIN_VALUE && divisor == -1) {
             return Integer.MAX_VALUE;
         }
-        int result = 0, shift;
+        if (divisor == 1) {
+            return dividend;
+        }
+        if (divisor == -1) {
+            return -dividend;
+        }
+
+        boolean negativeResult = (dividend < 0 && divisor > 0) || (dividend > 0 && divisor < 0);
         long a = Math.abs((long) dividend), b = Math.abs((long) divisor);
+        int result = 0, shift;
+
         for (; a >= b;) {
             shift = 0;
             for (; a >= (b << shift);) {
@@ -33,10 +42,8 @@ public class DivideTwoIntegers {
             a -= (b << shift);
             result += (1 << shift);
         }
-        if ((dividend > 0 && divisor < 0) || (dividend < 0 && divisor > 0)) {
-            return -result;
-        }
-        return result;
+
+        return negativeResult ? -result : result;
     }
 
     public static void main(String... args) {
