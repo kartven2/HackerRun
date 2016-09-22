@@ -17,7 +17,6 @@ public class NextHighestWord {
         //HEFG -> HEGF
         //HEBB -> HEBB
         //EHBB -> HEBB
-        char[] res = x.toCharArray();
         int n = x.length(), hiidx = -1;
         for (int i = n - 2; i >= 0; i--) {
             if (x.charAt(i) < x.charAt(i + 1)) {
@@ -28,18 +27,19 @@ public class NextHighestWord {
         if (hiidx == -1) {
             return "No Answer";
         }
-        for (int j = n - 1; j >= hiidx + 1; j--) {
-            if (x.charAt(j) > x.charAt(hiidx)) {
-                char tmp = res[j];
+        char[] res = x.toCharArray();
+        for (int j = n - 1; j > hiidx; j--) {
+            if (res[j] > res[hiidx]) {
+                char temp = res[j];
                 res[j] = res[hiidx];
-                res[hiidx] = tmp;
+                res[hiidx] = temp;
                 break;
             }
         }
         for (int i = hiidx + 1, j = n - 1; i < j; i++, j--) {
-            char tmp = res[i];
+            char temp = res[i];
             res[i] = res[j];
-            res[j] = tmp;
+            res[j] = temp;
         }
         return new String(res);
     }
