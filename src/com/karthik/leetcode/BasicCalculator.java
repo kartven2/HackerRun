@@ -7,8 +7,6 @@
  */
 package com.karthik.leetcode;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -17,33 +15,28 @@ import java.util.Stack;
  */
 public class BasicCalculator {
 
-    public static void main(String... args) {
-        BasicCalculator bc = new BasicCalculator();
-        System.out.print(bc.calculate("(3+2)"));
+    private int prec(char c) {
+        switch (c) {
+            case '(':
+            case ')':
+                return 0;
+            case '+':
+            case '-':
+                return 1;
+            default:
+                return -1;
+        }
     }
 
-    private long compute(long v1, long v2, char op) {
+    private long calc(char op, long v1, long v2) {
         switch (op) {
             case '+':
                 return v1 + v2;
             case '-':
                 return v1 - v2;
             default:
-                throw new IllegalArgumentException("Bad Input");
+                throw new IllegalArgumentException("Bad operator");
         }
-    }
-
-    private static final Map<Character, Integer> pc = new HashMap<>();
-
-    static {
-        pc.put('(', 0);
-        pc.put(')', 0);
-        pc.put('+', 1);
-        pc.put('-', 1);
-    }
-
-    private boolean isNumber(char c) {
-        return c != '(' && c != ')' && c != '+' && c != '-' && c != ' ';
     }
 
     public int calculate(String s) {
@@ -52,17 +45,15 @@ public class BasicCalculator {
         }
         Stack<Long> vals = new Stack<>();
         Stack<Character> ops = new Stack<>();
-        int n = s.length();
         char[] sa = s.toCharArray();
-        for (int i = 0; i < n;) {
-            char c = sa[i];
-            if (c == ' ') {
+        for (int i = 0; i < sa.length;) {
+            if (sa[i] == ' ') {
                 i++;
                 continue;
             }
-            if (isNumber(c)) {
+            if (sa[i] != ' ' && sa[i] != '(' && sa[i] != ')' && sa[i] != '+' && sa[i] != '-') {
                 StringBuilder sb = new StringBuilder();
-                while (i < n && isNumber(sa[i])) {
+                while (i < sa.length && sa[i] != ' ' && sa[i] != '(' && sa[i] != ')' && sa[i] != '+' && sa[i] != '-') {
                     sb.append(sa[i]);
                     i++;
                 }
@@ -70,32 +61,28 @@ public class BasicCalculator {
                 continue;
             }
             for (;;) {
-                if (ops.isEmpty() || c == '(' || pc.get(c) > pc.get(ops.peek())) {
-                    ops.push(c);
+                if (ops.isEmpty() || sa[i] == '(' || prec(sa[i]) > prec(ops.peek())) {
+                    ops.push(sa[i]);
                     break;
                 }
-
-                char op = ops.pop();
-                if (op == '(') {
+                char c = ops.pop();
+                if (c == '(') {
                     break;
                 }
-
                 long v2 = vals.pop(), v1 = vals.pop();
-                vals.push(compute(v1, v2, op));
+                vals.push(calc(c, v1, v2));
             }
             i++;
         }
-
         while (!ops.isEmpty()) {
-            char op = ops.pop();
+            char c = ops.pop();
             long v2 = vals.pop();
             if (vals.isEmpty()) {
                 return (int) v2;
             }
             long v1 = vals.pop();
-            vals.push(compute(v1, v2, op));
+            vals.push(calc(c, v1, v2));
         }
-
         long ans = vals.pop();
         return (int) ans;
     }
