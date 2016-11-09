@@ -9,7 +9,8 @@
  * The graph has a total of three nodes, and therefore contains three parts as separated by #.
  * First node is labeled as 0. Connect node 0 to both nodes 1 and 2.
  * Second node is labeled as 1. Connect node 1 to node 2.
- * Third node is labeled as 2. Connect node 2 to node 2 (itself), thus forming a self-cycle. *
+ * Third node is labeled as 2. Connect node 2 to node 2 (itself), thus forming a self-cycle.
+ *
  */
 package com.karthik.leetcode;
 
