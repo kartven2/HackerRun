@@ -15,8 +15,6 @@ package com.karthik.leetcode;
  */
 public class AddSearchWord {
 
-    private Trie trie = new Trie();
-
     class Trie {
 
         private Node root;
@@ -24,11 +22,11 @@ public class AddSearchWord {
 
         class Node {
 
-            private Node[] nlist;
+            private Node[] ch;
             private boolean end;
 
             Node() {
-                nlist = new Node[26];
+                ch = new Node[26];
             }
         }
 
@@ -41,10 +39,10 @@ public class AddSearchWord {
                 hasEmpty = true;
                 return;
             }
-            root = insert(word, root, 0);
+            root = insert(root, word, 0);
         }
 
-        private Node insert(String word, Node x, int d) {
+        private Node insert(Node x, String word, int d) {
             if (x == null) {
                 x = new Node();
             }
@@ -52,8 +50,8 @@ public class AddSearchWord {
                 x.end = true;
                 return x;
             }
-            char c = word.charAt(d);
-            x.nlist[c - 'a'] = insert(word, x.nlist[c - 'a'], d + 1);
+            int idx = word.charAt(d) - 'a';
+            x.ch[idx] = insert(x.ch[idx], word, d + 1);
             return x;
         }
 
@@ -71,22 +69,23 @@ public class AddSearchWord {
             if (x == null) {
                 return false;
             }
-            if (d == word.length()) {
+            if (word.length() == d) {
                 return x.end;
             }
             char c = word.charAt(d);
             if (c == '.') {
                 for (int i = 0; i < 26; i++) {
-                    if (search(x.nlist[i], word, d + 1)) {
+                    if (x.ch[i] != null && search(x.ch[i], word, d + 1)) {
                         return true;
                     }
                 }
                 return false;
             }
-            return search(x.nlist[c - 'a'], word, d + 1);
+            return search(x.ch[c - 'a'], word, d + 1);
         }
-
     }
+
+    private Trie trie = new Trie();
 
     public void addWord(String word) {
         trie.insert(word);
