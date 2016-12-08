@@ -1,5 +1,5 @@
 /*-
- * Codeforces problem :
+ * LeetCode problem :
  * https://leetcode.com/problems/patching-array/
  *
  * Given a sorted positive integer array nums and an integer n,
