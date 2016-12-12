@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
  */
-public class WordSearch {
+public class WordSearchII {
 
     private Trie trie;
     private boolean[][] marked;
@@ -135,7 +135,7 @@ public class WordSearch {
     }
 
     public static void main(String... args) {
-        WordSearch ws = new WordSearch();
+        WordSearchII ws = new WordSearchII();
         char[][] board = {{'o', 'a', 'a', 'n'}, {'e', 't', 'a', 'e'}, {'i', 'h', 'k', 'r'}, {'i', 'f', 'l', 'v'}};
         String[] words = {"oath", "pea", "eat", "rain"};
         List<String> answer = ws.findWords(board, words);
