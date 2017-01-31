@@ -169,7 +169,7 @@ public class SudokuSolver {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (board[i][j] == '.') {
-                    char c = (char)('0'+game[i][j]);
+                    char c = (char) ('0' + game[i][j]);
                     board[i][j] = c;
                 }
             }
@@ -177,27 +177,24 @@ public class SudokuSolver {
     }
 
     private boolean playgame(Map<String, List<Integer>> map, int[][] game, int ci, int cj) {
-        if (ci == 9 && cj == 8) {
+        if (ci == 8 && cj == 9) {
             return true;
         }
-        if (ci == 9) {
-            return playgame(map, game, 0, cj + 1);
+        if (cj == 9) {
+            return playgame(map, game, ci + 1, 0);
         }
-        if (game[ci][cj] != 0) {
-            return playgame(map, game, ci + 1, cj);
+        if (game[ci][cj] > 0) {
+            return playgame(map, game, ci, cj + 1);
         }
-        //for(int pVal : map.get(ci + "-" + cj)) {
-        for(int m=1; m<=9; m++) { 
-           
-            //game[ci][cj] = pVal;
-            if(isLegal(game, ci, cj)) {
-                 game[ci][cj] = m;
-                 if(playgame(map, game, ci+1, cj)) {
-                    return true;     
-                 }
-                 game[ci][cj] = 0;
+        for (int pVal : map.get(ci + "-" + cj)) {
+            game[ci][cj] = pVal;
+            if (isLegal(game, ci, cj)) {
+                if (playgame(map, game, ci, cj + 1)) {
+                    return true;
+                }
             }
         }
+        game[ci][cj] = 0;
         return false;
     }
 
@@ -216,12 +213,11 @@ public class SudokuSolver {
         char[][] input = new char[][]{a, b, c, d, e, f, g, h, i};
         //"..9748...","7........",".2.1.9...","..7...24.",".64.1.59.",".98...3..","...8.3.2.","........6","...2759.."
         ss.solveSudoku(input);
-        for(int k=0; k<9; k++) {
-            for(int j=0; j<9; j++) {
-                System.out.print(input[k][j]+", ");
+        for (int k = 0; k < 9; k++) {
+            for (int j = 0; j < 9; j++) {
+                System.out.print(input[k][j] + ", ");
             }
             System.out.println();
         }
     }
-
 }
