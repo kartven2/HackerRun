@@ -28,15 +28,15 @@ import java.util.Stack;
  * @email kafy83@gmail.com
  */
 public class ReconstructItinerary {
-
+    
     private static final int R = 26;
     private static final char FC = 'A';
     private static final String JFK = "JFK";
     private static final Map<String, Integer> MAP = new HashMap<>();
     private static String[] array;
-
+    
     static class Lsd {
-
+        
         private void sort(String[] a) {
             if (a == null || a.length == 0) {
                 return;
@@ -60,12 +60,12 @@ public class ReconstructItinerary {
             }
         }
     }
-
+    
     static class Domain {
-
+        
         private int[] a;
         private int i;
-
+        
         Domain(List<Integer> b) {
             int sz = b == null ? 0 : b.size();
             this.a = new int[sz];
@@ -78,16 +78,16 @@ public class ReconstructItinerary {
             }
             Arrays.sort(a);
         }
-
+        
         private boolean hasNext() {
             return i < a.length;
         }
-
+        
         private int next() {
             return a[i++];
         }
     }
-
+    
     private Set<String> getDistinctCitySet(int n, String[][] tickets) {
         final Set<String> src = new HashSet<>();
         for (int i = 0; i < n; i++) {
@@ -97,18 +97,16 @@ public class ReconstructItinerary {
         }
         return src;
     }
-
+    
     private void assignCityIdx(String[] citys) {
         int sz = 0;
-        array = new String[citys.length + 1];
-        MAP.put(JFK, sz);
-        array[sz++] = JFK;
+        array = new String[citys.length];
         for (String city : citys) {
             MAP.put(city, sz);
             array[sz++] = city;
         }
     }
-
+    
     private Domain[] getDomains(int n, int nc, String[][] tickets) {
         List<Integer>[] adj = (List<Integer>[]) new LinkedList[nc];
         for (int i = 0; i < n; i++) {
@@ -127,7 +125,7 @@ public class ReconstructItinerary {
         }
         return domain;
     }
-
+    
     public List<String> findItinerary(String[][] tickets) {
         List<String> result = new LinkedList<>();
         if (tickets == null || tickets.length == 0) {
@@ -139,12 +137,10 @@ public class ReconstructItinerary {
             return result;
         }
         int nc = citySet.size();
-        String[] a = new String[nc - 1];
+        String[] a = new String[nc];
         int sz = 0;
         for (String city : citySet) {
-            if (!city.equals(JFK)) {
-                a[sz++] = city;
-            }
+            a[sz++] = city;
         }
         Lsd lsd = new Lsd();
         lsd.sort(a);
@@ -152,7 +148,7 @@ public class ReconstructItinerary {
         Domain[] domain = getDomains(n, nc, tickets);
         Stack<String> path = new Stack<>();
         Stack<Integer> stk = new Stack<>();
-        stk.push(0);
+        stk.push(MAP.get(JFK));
         while (!stk.isEmpty()) {
             int v = stk.pop();
             while (domain[v].hasNext()) {
