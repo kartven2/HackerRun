@@ -15,32 +15,35 @@ package com.karthik.leetcode;
  */
 public class NumberOfDigitOne {
 
-    private static final int[] DP = new int[(int) 5e8 + 1];
-    private static final int MAX = Integer.MAX_VALUE;
+    private static final int[] DP = new int[10];
 
     public int countDigitOne(int n) {
-        for (int i = 9, j = 1, k = 0; i <= (MAX / 10 - 9); i = (i * 10) + 9, j++, k++) {
-            DP[j] = DP[j - 1] * 10 + (int) Math.pow(10, k);
+        for (int j = 1, k = 0; j < 10; k = (k * 10) + 9, j++) {
+            DP[j] = DP[j - 1] * 10 + (k + 1);
         }
-        
         return eval(n);
     }
-    
+
     private int eval(int n) {
-        if(n<=0) {
+        if (n <= 0) {
             return 0;
         }
-        if(n<=9) {
+        if (n <= 9) {
             return 1;
         }
-        int m = 1;
-        for(;m<=n;m*=10);
-        int dpIdx = Integer.toString(m-1).length(), fd = n/m;
-        int ans = DP[dpIdx]*fd;
-        ans += fd > 1 ? m : 0;
-        ans += fd == 1 ? 
-        
-        
-        
+        long mm = 1;
+        for (; mm <= n; mm *= 10);
+        mm /= 10;
+        int m = (int) mm;
+        int dpIdx = Integer.toString(m - 1).length(), fd = n / m;
+        int ans = DP[dpIdx] * fd;
+        ans += fd > 1 ? m : fd == 1 ? (n % m) + 1 : 0;
+        ans += eval(n % m);
+        return ans;
+    }
+
+    public static void main(String... args) {
+        NumberOfDigitOne ndo = new NumberOfDigitOne();
+        System.out.println(ndo.countDigitOne(1410065408));
     }
 }
