@@ -14,31 +14,36 @@ package com.karthik.leetcode;
  * @email kafy83@gmail.com
  */
 public class NumberOfDigitOne {
-
-    private static final int[] DP = new int[10];
-
+    private int[] dp = new int[10];
+    
     public int countDigitOne(int n) {
-        for (int j = 1, k = 0; j < 10; k = (k * 10) + 9, j++) {
-            DP[j] = DP[j - 1] * 10 + (k + 1);
-        }
-        return eval(n);
+     if(n<=0) {
+         return 0;
+     }
+     if(n<=9) {
+         return 1;
+     }
+     int m=1;
+     for(int i=n/10; i>0; i/=10) {
+         m*=10;
+     }
+     for(int i=1,j=0; i<=Integer.toString(m-1).length(); i++, j=(j*10)+9) {
+         dp[i] = dp[i-1] * 10 + (j+1); 
+     }
+     return eval(n, m);
     }
-
-    private int eval(int n) {
-        if (n <= 0) {
+    
+    private int eval(int n, int m) {
+        if(n<=0) {
             return 0;
         }
-        if (n <= 9) {
+        if(n<=9) {
             return 1;
         }
-        long mm = 1;
-        for (; mm <= n; mm *= 10);
-        mm /= 10;
-        int m = (int) mm;
-        int dpIdx = Integer.toString(m - 1).length(), fd = n / m;
-        int ans = DP[dpIdx] * fd;
-        ans += fd > 1 ? m : fd == 1 ? (n % m) + 1 : 0;
-        ans += eval(n % m);
+        int fd = n/m;
+        int ans = dp[Integer.toString(m-1).length()] * fd;
+        ans += fd > 1 ? m : fd == 1 ? (n%m)+1 : 0;
+        ans += eval(n%m, m/10);
         return ans;
     }
 
