@@ -50,6 +50,23 @@ public class BestTimeBuyAndSellStockCooldown {
         return eval(x, prices, n, ans, i + 1);
     }
 
+    public int maxProfit2(int[] prices) {
+        if (prices == null || prices.length < 2) {
+            return 0;
+        }
+        int b1 = -prices[0], b = 0, s2 = 0, s1 = 0, s = 0, n = prices.length;
+        for (int i = 1; i < n; i++) {
+            b = Math.max(b1, s2 - prices[i]);
+            s = Math.max(s1, b1 + prices[i]);
+            b1 = b;
+            b = 0;
+            s2 = s1;
+            s1 = s;
+            s = 0;
+        }
+        return s1;
+    }
+
     public static void main(String... args) {
         BestTimeBuyAndSellStockCooldown btbssc = new BestTimeBuyAndSellStockCooldown();
         int[] prices = {1, 2, 3, 0, 2};
