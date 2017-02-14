@@ -23,8 +23,15 @@ public class BestTimeBuyAndSellStockCooldown {
             return 0;
         }
         int n = prices.length;
-        Integer[] sp = new Integer[2];
-        return eval(null, prices, n, 0, 0);
+        //return eval(null, prices, n, 0, 0);
+        int[] buy = new int[n];
+        int[] sell = new int[n];
+        buy[0] = -prices[0];
+        for (int i = 1; i < n; i++) {
+            buy[i] = Math.max(buy[i - 1], i == 1 ? -prices[i] : sell[i - 2] - prices[i]);
+            sell[i] = Math.max(sell[i - 1], buy[i - 1] + prices[i]);
+        }
+        return sell[n - 1];
     }
 
     private int eval(Integer x, int[] prices, int n, int ans, int i) {
