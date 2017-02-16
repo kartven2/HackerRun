@@ -32,8 +32,22 @@ public class PalindromePartitioningII {
             }
         }
         int[] minCuts = new int[n];
-        for(int i=0; i<n; i++) {
-            
+        for (int i = 1; i <= n; i++) {
+            String subprob = s.substring(0, i);
+            int m = subprob.length();
+            for (int j = 0; j < m; j++) {
+                String sh = subprob.substring(j);
+                if (palindrome[j][m - 1]) {
+                    minCuts[i - 1] = minCuts[j - 1] + 1;
+                    break;
+                }
+            }
         }
+        return minCuts[n - 1];
+    }
+
+    public static void main(String... args) {
+        PalindromePartitioningII pp = new PalindromePartitioningII();
+        System.out.println(pp.minCut("Banana"));
     }
 }
