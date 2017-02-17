@@ -9,6 +9,8 @@
  */
 package com.karthik.leetcode;
 
+import java.util.Arrays;
+
 /**
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
@@ -23,23 +25,29 @@ public class PalindromePartitioningII {
         boolean[][] palindrome = new boolean[n][n];
         for (int i = 0; i < n; i++) {
             palindrome[i][i] = true;
+            if (i > 0) {
+                palindrome[i][i - 1] = true;
+            }
         }
         for (int k = 1; k < n; k++) {
-            for (int i = 0, j = 1; j < n; i++, j++) {
+            for (int i = 0, j = i + k; j < n; i++, j++) {
                 if (s.charAt(i) == s.charAt(j) && palindrome[i + 1][j - 1]) {
                     palindrome[i][j] = true;
                 }
             }
         }
         int[] minCuts = new int[n];
-        for (int i = 1; i <= n; i++) {
-            String subprob = s.substring(0, i);
-            int m = subprob.length();
-            for (int j = 0; j < m; j++) {
-                String sh = subprob.substring(j);
-                if (palindrome[j][m - 1]) {
-                    minCuts[i - 1] = minCuts[j - 1] + 1;
-                    break;
+        Arrays.fill(minCuts, n);
+        minCuts[0] = 0;
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (palindrome[j][i]) {
+                    if (j == 0) {
+                        minCuts[i] = 0;
+                        break;
+                    } else {
+                        minCuts[i] = Math.min(minCuts[i], minCuts[j - 1] + 1);
+                    }
                 }
             }
         }
@@ -48,6 +56,6 @@ public class PalindromePartitioningII {
 
     public static void main(String... args) {
         PalindromePartitioningII pp = new PalindromePartitioningII();
-        System.out.println(pp.minCut("Banana"));
+        System.out.println(pp.minCut("abbab"));
     }
 }
