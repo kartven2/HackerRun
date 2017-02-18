@@ -11,7 +11,8 @@
  */
 package com.karthik.leetcode;
 
-import java.util.Stack;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Karthik Venkataraman
@@ -19,128 +20,54 @@ import java.util.Stack;
  */
 public class BasicCalculatorII {
 
-    private int priority(char c) {
-        switch (c) {
-            case '+':
-            case '-':
-                return 0;
-            case '*':
-            case '/':
-                return 1;
-            default:
-                throw new IllegalArgumentException("Invalid Character Found");
-        }
-    }
-
-    private String getValidExp(String s) {
-        StringBuilder sb = new StringBuilder();
-        int n = s.length();
-        for (int i = 0; i < n; i++) {
-            char c = s.charAt(i);
-            if (c != ' ') {
-                switch (c) {
-                    case '+':
-                    case '-':
-                    case '*':
-                    case '/':
-                        if (sb.toString().isEmpty() || sb.charAt(sb.length() - 1) == '+'
-                                || sb.charAt(sb.length() - 1) == '-' || sb.charAt(sb.length() - 1) == '*'
-                                || sb.charAt(sb.length() - 1) == '/') {
-                            sb.append('0');
-                        }
-                        sb.append(c);
-                        break;
-                    case '0':
-                        if (!(sb.toString().isEmpty() || sb.charAt(sb.length() - 1) == '+'
-                                || sb.charAt(sb.length() - 1) == '-' || sb.charAt(sb.length() - 1) == '*'
-                                || sb.charAt(sb.length() - 1) == '/')) {
-                            sb.append(c);
-                        }
-                        break;
-                    default:
-                        sb.append(c);
-                        break;
-                }
-            }
-        }
-        if (sb.toString().isEmpty()) {
-            return "0";
-        }
-        if (sb.charAt(sb.length() - 1) == '+' || sb.charAt(sb.length() - 1) == '-' || sb.charAt(sb.length() - 1) == '*' || sb.charAt(sb.length() - 1) == '/') {
-            sb.append("0");
-        }
-        return sb.toString();
-    }
-
     public int calculate(String s) {
         if (s == null || s.trim().length() == 0) {
             return 0;
         }
-        String exp = getValidExp(s);
-        Stack<Character> ops = new Stack<>();
-        Stack<Long> vals = new Stack<>();
-        int n = exp.length();
+        List<Character> sign = Arrays.asList(new Character[]{'+', '-', '*', '/'});
+        int result = 0, curResult = 0, n = s.length();
+        char op = '+';
         for (int i = 0; i < n;) {
-            char c = exp.charAt(i);
-            switch (c) {
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                    if (ops.isEmpty() || priority(ops.peek()) < priority(c)) {
-                        ops.push(c);
-                    } else if (priority(ops.peek()) >= priority(c)) {
-                        while (!ops.isEmpty() && priority(ops.peek()) >= priority(c)) {
-                            char op = ops.pop();
-                            long val2 = vals.pop();
-                            long val1 = vals.pop();
-                            switch (op) {
-                                case '+':
-                                    vals.push(val1 + val2);
-                                    break;
-                                case '-':
-                                    vals.push(val1 - val2);
-                                    break;
-                                case '*':
-                                    vals.push(val1 * val2);
-                                    break;
-                                case '/':
-                                    vals.push(val1 / val2);
-                                    break;
-                            }
-                        }
-                        ops.push(c);
-                    }
-                    i++;
-                    break;
-                default:
-                    StringBuilder sb = new StringBuilder();
-                    while (i < n && exp.charAt(i) != '+' && exp.charAt(i) != '-' && exp.charAt(i) != '*' && exp.charAt(i) != '/') {
-                        sb.append(exp.charAt(i));
-                        i++;
-                    }
-                    vals.push(Long.parseLong(sb.toString()));
+            char c = s.charAt(i);
+            if (c == ' ') {
+                i++;
+                continue;
             }
-        }
-        while (!ops.isEmpty()) {
-            char op = ops.pop();
-            long val2 = vals.pop();
-            long val1 = vals.pop();
+            if (sign.contains(c)) {
+                if (c == '+' || c == '-') {
+                    result += curResult;
+                    curResult = 0;
+                }
+                op = c;
+                i++;
+                continue;
+            }
+            int tmp = c - '0', num = 0;
+            while (++i < n && !sign.contains(s.charAt(i))) {
+                c = s.charAt(i);
+                if (c == ' ') {
+                    continue;
+                }
+                num = c - '0';
+                tmp = tmp * 10 + num;
+            }
             switch (op) {
                 case '+':
-                    vals.push(val1 + val2);
+                    curResult += tmp;
                     break;
                 case '-':
-                    vals.push(val1 - val2);
+                    curResult -= tmp;
                     break;
                 case '*':
-                    vals.push(val1 * val2);
+                    curResult *= tmp;
                     break;
                 case '/':
-                    vals.push(val1 / val2);
+                    curResult /= tmp;
                     break;
+                default:
+                    throw new IllegalArgumentException("Bad operator");
             }
         }
-        return (int) vals.pop().longValue();
+        return result + curResult;
     }
 }
