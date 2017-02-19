@@ -15,10 +15,10 @@
  */
 package com.karthik.leetcode;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 /**
  * @author Karthik Venkataraman
@@ -26,7 +26,16 @@ import java.util.Queue;
  */
 public class MinimumHeightTrees {
 
-    private static final int MAX = Integer.MAX_VALUE;
+    class BfsResult {
+
+        private int lastVertex;
+        private int[] edgeTo;
+
+        BfsResult(int l, int[] et) {
+            lastVertex = l;
+            edgeTo = et;
+        }
+    }
 
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
         List<Integer> result = new LinkedList<>();
@@ -41,7 +50,6 @@ public class MinimumHeightTrees {
         }
         List<Integer>[] adj = (List<Integer>[]) new LinkedList[n];
         int m = edges.length;
-        int[] degree = new int[n];
         for (int i = 0; i < m; i++) {
             if (adj[edges[i][0]] == null) {
                 adj[edges[i][0]] = new LinkedList<>();
@@ -49,53 +57,58 @@ public class MinimumHeightTrees {
             if (adj[edges[i][1]] == null) {
                 adj[edges[i][1]] = new LinkedList<>();
             }
-            degree[edges[i][0]]++;
-            degree[edges[i][1]]++;
             adj[edges[i][0]].add(edges[i][1]);
             adj[edges[i][1]].add(edges[i][0]);
         }
-        int[] maxHeight = new int[n];
-        Arrays.fill(maxHeight, MAX);
-        for (int i = 0; i < n; i++) {
-            if (degree[i] > 1) {
-                maxHeight[i] = bfs(i, adj, n);
+        int v = bfs(0, adj, n).lastVertex;
+        BfsResult bfsResult = bfs(v, adj, n);
+        Stack<Integer> path = findPath(v, bfsResult.lastVertex, bfsResult.edgeTo);
+        int sz = path.size();
+        if (sz % 2 == 0) {
+            for (int i = 0; i < (sz / 2) - 1; i++) {
+                path.pop();
             }
+            result.add(path.pop());
+            result.add(path.pop());
+            return result;
         }
-        int minHeight = MAX;
-        for (int i = 0; i < n; i++) {
-            if (maxHeight[i] < minHeight) {
-                minHeight = maxHeight[i];
-            }
+        for (int i = 0; i < (sz / 2); i++) {
+            path.pop();
         }
-        for (int i = 0; i < n; i++) {
-            if (maxHeight[i] == minHeight) {
-                result.add(i);
-            }
-        }
+        result.add(path.pop());
         return result;
     }
 
-    private int bfs(int s, List<Integer>[] adj, int n) {
+    private BfsResult bfs(int s, List<Integer>[] adj, int n) {
         Queue<Integer> q = new LinkedList<>();
         boolean[] mk = new boolean[n];
-        int[] distTo = new int[n];
-        int maxDist = 0;
+        int[] edgeTo = new int[n];
         q.add(s);
         mk[s] = true;
-        distTo[s] = 0;
+        int lastVertex = -1;
         while (!q.isEmpty()) {
             int v = q.remove();
             for (int w : adj[v]) {
                 if (!mk[w]) {
                     mk[w] = true;
                     q.add(w);
-                    distTo[w] = distTo[v] + 1;
-                    if (maxDist < distTo[w]) {
-                        maxDist = distTo[w];
-                    }
+                    lastVertex = w;
+                    edgeTo[w] = v;
                 }
             }
         }
-        return maxDist;
+        return new BfsResult(lastVertex, edgeTo);
+    }
+
+    private Stack<Integer> findPath(int s, int d, int[] edgeTo) {
+        Stack<Integer> path = new Stack<>();
+        path.push(d);
+        int x = d;
+        while (edgeTo[x] != s) {
+            x = edgeTo[x];
+            path.push(x);
+        }
+        path.push(s);
+        return path;
     }
 }
