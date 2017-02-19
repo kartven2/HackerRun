@@ -18,6 +18,7 @@ package com.karthik.leetcode;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author Karthik Venkataraman
@@ -25,12 +26,14 @@ import java.util.List;
  */
 public class MinimumHeightTrees {
 
+    private static final int MAX = Integer.MAX_VALUE;
+
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
         List<Integer> result = new LinkedList<>();
         if (n <= 0) {
             return result;
         }
-        if (edges == null || edges.length == 0) {
+        if (edges == null || edges.length == 0 || n == 2 && edges.length == 1) {
             for (int i = 0; i < n; i++) {
                 result.add(i);
             }
@@ -38,6 +41,7 @@ public class MinimumHeightTrees {
         }
         List<Integer>[] adj = (List<Integer>[]) new LinkedList[n];
         int m = edges.length;
+        int[] degree = new int[n];
         for (int i = 0; i < m; i++) {
             if (adj[edges[i][0]] == null) {
                 adj[edges[i][0]] = new LinkedList<>();
@@ -45,39 +49,53 @@ public class MinimumHeightTrees {
             if (adj[edges[i][1]] == null) {
                 adj[edges[i][1]] = new LinkedList<>();
             }
+            degree[edges[i][0]]++;
+            degree[edges[i][1]]++;
             adj[edges[i][0]].add(edges[i][1]);
             adj[edges[i][1]].add(edges[i][0]);
         }
-        int[] edgedist = new int[n];
-        int[] mk = null;
+        int[] maxHeight = new int[n];
+        Arrays.fill(maxHeight, MAX);
         for (int i = 0; i < n; i++) {
-            mk = new int[n];
-            Arrays.fill(mk, -1);
-            mk[i] = 0;
-            dfs(i, adj, mk);
-            edgedist[i] = Integer.MIN_VALUE;
-            for (int j = 0; j < n; j++) {
-                edgedist[i] = Math.max(edgedist[i], mk[j]);
+            if (degree[i] > 1) {
+                maxHeight[i] = bfs(i, adj, n);
             }
         }
-        int mindist = Integer.MAX_VALUE;
+        int minHeight = MAX;
         for (int i = 0; i < n; i++) {
-            mindist = Math.min(mindist, edgedist[i]);
+            if (maxHeight[i] < minHeight) {
+                minHeight = maxHeight[i];
+            }
         }
         for (int i = 0; i < n; i++) {
-            if (mindist == edgedist[i]) {
+            if (maxHeight[i] == minHeight) {
                 result.add(i);
             }
         }
         return result;
     }
 
-    private void dfs(int v, List<Integer>[] adj, int[] mk) {
-        for (int w : adj[v]) {
-            if (mk[w] < 0) {
-                mk[w] = mk[v] + 1;
-                dfs(w, adj, mk);
+    private int bfs(int s, List<Integer>[] adj, int n) {
+        Queue<Integer> q = new LinkedList<>();
+        boolean[] mk = new boolean[n];
+        int[] distTo = new int[n];
+        int maxDist = 0;
+        q.add(s);
+        mk[s] = true;
+        distTo[s] = 0;
+        while (!q.isEmpty()) {
+            int v = q.remove();
+            for (int w : adj[v]) {
+                if (!mk[w]) {
+                    mk[w] = true;
+                    q.add(w);
+                    distTo[w] = distTo[v] + 1;
+                    if (maxDist < distTo[w]) {
+                        maxDist = distTo[w];
+                    }
+                }
             }
         }
+        return maxDist;
     }
 }
