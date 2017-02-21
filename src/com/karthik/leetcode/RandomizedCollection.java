@@ -9,11 +9,10 @@
  */
 package com.karthik.leetcode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -21,47 +20,71 @@ import java.util.Map;
  */
 public class RandomizedCollection {
 
-    private List<Integer> list;
-    private Map<Integer, List<Integer>> map;
-    private int idx=0;
+    private Map<Integer, Integer> m1;
+    private Map<Integer, Set<Integer>> m2;
+    private int idx;
 
     /**
      * Initialize your data structure here.
      */
     public RandomizedCollection() {
-        list = new LinkedList<>();
-        map = new HashMap<>();
+        m1 = new HashMap<>();
+        m2 = new HashMap<>();
+        idx = 0;
     }
 
     /**
-     * Inserts a value to the collection. Returns true if the collection did not already contain the specified element.
+     * Inserts a value to the collection. Returns true if the collection did not
+     * already contain the specified element.
      */
     public boolean insert(int val) {
-        List<Integer> posList = map.get(val);
-        boolean result = posList == null;
-        if(result) {
-            posList = new LinkedList<>();
+        Set<Integer> set = m2.get(val);
+        boolean result = set == null;
+        if (result) {
+            set = new HashSet<>();
         }
-        list.add(val);
-        posList.add(idx++);
-        map.put(val, posList);
+        set.add(idx);
+        m1.put(idx++, val);
+        m2.put(val, set);
         return result;
     }
 
     /**
-     * Removes a value from the collection. Returns true if the collection contained the specified element.
+     * Removes a value from the collection. Returns true if the collection
+     * contained the specified element.
      */
     public boolean remove(int val) {
-      List<Integer> posList = map.get(val);
-      boolean result = posList != null;
-      
-        
+        Set<Integer> pos = m2.get(val);
+        if (pos == null) {
+            return false;
+        }
+        int lastVal = m1.get(idx - 1);
+        if (lastVal == val) {
+            m1.remove(idx - 1);
+            pos.remove(--idx);
+            if (pos.isEmpty()) {
+                m2.remove(val);
+            }
+            return true;
+        }
+        m1.remove(idx - 1);
+        Set<Integer> posLastVal = m2.get(lastVal);
+        posLastVal.remove(--idx);
+        int posVal = pos.iterator().next();
+        pos.remove(posVal);
+        if (pos.isEmpty()) {
+            m2.remove(val);
+        }
+        posLastVal.add(posVal);
+        m1.put(posVal, lastVal);
+        return true;
     }
 
     /**
      * Get a random element from the collection.
      */
     public int getRandom() {
-
+        int randIdx = (int) (Math.random() * idx);
+        return m1.get(randIdx);
     }
 }
