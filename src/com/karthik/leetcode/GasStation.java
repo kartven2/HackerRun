@@ -20,38 +20,19 @@ package com.karthik.leetcode;
 public class GasStation {
 
     public int canCompleteCircuit(int[] gas, int[] cost) {
-        if (gas == null || cost == null || gas.length == 0
-                || cost.length == 0 || gas.length != cost.length) {
+        if (gas == null || cost == null || gas.length == 0 || cost.length == 0 || gas.length != cost.length) {
             return -1;
         }
-        int n = gas.length;
-        int[] diff = new int[n];
-        long net = 0;
-        for (int i = 0; i < n; i++) {
-            diff[i] = gas[i] - cost[i];
-            net += diff[i];
-        }
-        if (net < 0) {
-            return -1;
-        }
-        for (int i = 0; i < n; i++) {
-            if (diff[i] < 0) {
-                continue;
-            }
-            int bal = 0;
-            boolean complete = true;
-            for (int j = i, k=0; k<n; j = (j + 1) % n, k++) {
-                if (diff[j] >= 0 || bal + diff[j] >= 0) {
-                    bal += diff[j];
-                } else {
-                    complete = false;
-                    break;
-                }
-            }
-            if (complete) {
-                return i;
+        int n = gas.length, s = n - 1, e = 0, sum = gas[s] - cost[s];
+        while (s > e) {
+            if (sum >= 0) {
+                sum += gas[e] - cost[e];
+                e++;
+            } else {
+                s--;
+                sum += gas[s] - cost[s];
             }
         }
-        return -1;
+        return sum >= 0 ? s : -1;
     }
 }
