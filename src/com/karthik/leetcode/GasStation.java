@@ -35,4 +35,28 @@ public class GasStation {
         }
         return sum >= 0 ? s : -1;
     }
+
+    public int canCompleteCircuit2(int[] gas, int[] cost) {
+        if (gas == null || cost == null || gas.length == 0 || cost.length == 0 || gas.length != cost.length) {
+            return -1;
+        }
+        int n = gas.length, tank = 0, start = 0, net = 0;
+        for (int i = 0; i < n; i++) {
+            tank += gas[i] - cost[i];
+            net += gas[i] - cost[i];
+            if (tank < 0) {
+                tank = 0;
+                start = i + 1;
+            }
+        }
+        return net < 0 ? -1 : start;
+    }
+    
+    public static void main(String...args) {
+        GasStation gs = new GasStation();
+        int[] gas = {3,3,4,5};
+        int[] cost = {3,2,4,5};
+        System.out.println(gs.canCompleteCircuit(gas, cost));
+        System.out.println(gs.canCompleteCircuit2(gas, cost));
+    }
 }
