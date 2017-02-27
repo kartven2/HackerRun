@@ -48,6 +48,11 @@ public class MiniParser {
         }
     }
 
+    public static void main(String... args) {
+        MiniParser mp = new MiniParser();
+        mp.deserialize("324");
+    }
+
     public NestedInteger deserialize(String s) {
         if (s == null || s.trim().length() == 0) {
             return null;
@@ -58,6 +63,7 @@ public class MiniParser {
         Stack<NestedInteger> stk = new Stack<>();
         NestedInteger x = root;
         Integer num = null;
+        boolean addToList = false;
         while (i < n) {
             if (c[i] == '-' || c[i] <= '9' && c[i] >= '0') {
                 boolean sign = false;
@@ -72,22 +78,34 @@ public class MiniParser {
                 if (sign) {
                     num *= (-1);
                 }
-                x.setInteger(num);
+                if (addToList) {
+                    List<NestedInteger> xlist = x.getList();
+                    if (xlist == null) {
+                        xlist = new ArrayList<>();
+                    }
+                    NestedInteger tmp = new NestedInteger();
+                    tmp.setInteger(num);
+                    xlist.add(tmp);
+                    addToList = false;
+                } else {
+                    x.setInteger(num);
+                    addToList = true;
+                }
             } else if (c[i] == ',') {
-                List<NestedInteger> xlist = x.getList();
-                NestedInteger tmp = new NestedInteger();
-                xlist.add(tmp);
-                x = tmp;
+                addToList = true;
                 i++;
             } else if (c[i] == '[') {
-                List<NestedInteger> xlist = x.getList();
-                if (xlist == null) {
-                    xlist = new ArrayList<>();
-                }
                 stk.push(x);
-                NestedInteger tmp = new NestedInteger();
-                xlist.add(tmp);
-                x = tmp;
+                if (addToList) {
+                    List<NestedInteger> xlist = x.getList();
+                    if (xlist == null) {
+                        xlist = new ArrayList<>();
+                    }
+                    NestedInteger tmp = new NestedInteger();
+                    xlist.add(tmp);
+                    x = tmp;
+                }
+                addToList = true;
                 i++;
             } else if (c[i] == ']' && !stk.isEmpty()) {
                 x = stk.pop();
