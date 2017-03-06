@@ -8,7 +8,12 @@
  */
 package com.karthik.leetcode;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -16,35 +21,57 @@ import java.util.List;
  */
 public class RemoveInvalidParentheses {
 
+    private boolean isValid(String s) {
+        if (s == null || s.trim().length() == 0) {
+            return true;
+        }
+        int count = 0, n = s.length();
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) == '(') {
+                count++;
+            } else if (s.charAt(i) == ')') {
+                count--;
+            }
+            if (count < 0) {
+                return false;
+            }
+        }
+        return count == 0;
+    }
+
     public List<String> removeInvalidParentheses(String s) {
         List<String> result = new ArrayList<>();
-        if (s == null || s.trim().length() == 0) {
+        if (s == null) {
             return result;
         }
-        int n = s.length(), lpr = 0, rpr = 0;
-        int[] lp = new int[n];
-        int[] rp = new int[n];
-        for (int i = 0; i < n; i++) {
-            switch (s.charAt(i)) {
-                case '(':
-                    lp[lpr++] = i;
-                    break;
-                case ')':
-                    rp[rpr++] = i;
-                    break;
-                default:
-                    break;
+        if (s.trim().length() == 0) {
+            result.add(s);
+            return result;
+        }
+        Set<String> v = new HashSet<>();
+        Queue<String> q = new LinkedList<>();
+        q.add(s);
+        boolean found = false;
+        while (!q.isEmpty()) {
+            String x = q.remove();
+            if (isValid(x)) {
+                result.add(x);
+                found = true;
+            }
+            if (found) {
+                continue;
+            }
+            for (int i = 0; i < x.length(); i++) {
+                if (x.charAt(i) != '(' && x.charAt(i) != ')') {
+                    continue;
+                }
+                String m = new StringBuilder().append(x.substring(0, i)).append(x.substring(i + 1)).toString();
+                if (!v.contains(m)) {
+                    q.add(m);
+                    v.add(m);
+                }
             }
         }
-        int j = lpr, k = rpr, elp = 0, erp=0;
-        for (; j > 0 && k > 0;) {
-            if (lp[j] < rp[k]) {
-                j--;
-                k--;
-            } else {
-                j--;
-                elp++;
-            }
-        }
+        return result;
     }
 }
