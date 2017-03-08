@@ -34,11 +34,15 @@ public class UniqueBinarySearchTreesII {
         }
         for (int i = 1; i <= n; i++) {
             TreeNode root = new TreeNode(i);
-            boolean[] marked = new boolean[n];
-            marked[i - 1] = true;
-            root = buildBst(marked, root, i, n);
-            if (root != null) {
-                result.add(root);
+            for(int j=1; j<i; j++) {
+                for(int k=n; k>i; k--) {
+                  boolean[] marked = new boolean[n];
+                  marked[i - 1] = true;
+                  marked[j-1] = true;
+                  marked[k-1] = true;
+                  root = buildTree(marked, j, k, root)
+                  result.add(root);        
+                }
             }
         }
         return result;
@@ -61,42 +65,5 @@ public class UniqueBinarySearchTreesII {
             }
         }
         return x;
-    }
-
-    public List<TreeNode> generateTrees2(int n) {
-        List<TreeNode> result = new ArrayList<>();
-        if (n <= 0) {
-            return result;
-        }
-        int[] arr = new int[n + 1];
-        for (int i = 1; i <= n; i++) {
-            arr[i] = i;
-        }
-        while (true) {
-            TreeNode node = getTree(arr, 1, n);
-            if (node != null) {
-                result.add(node);
-            }
-            int x = n - 1;
-            while (x > 0 && arr[x + 1] < arr[x]) {
-                x--;
-            }
-            if (x == 0) {
-                break;
-            }
-            int y = n;
-            while (y > x && arr[y] < arr[x]) {
-                y--;
-            }
-            int tmp = arr[x];
-            arr[x] = arr[y];
-            arr[y] = tmp;
-            for (int i = x + 1, j = n; i < j; i++, j--) {
-                tmp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = tmp;
-            }
-        }
-        return result;
     }
 }
