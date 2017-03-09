@@ -8,6 +8,7 @@
  */
 package com.karthik.leetcode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,43 +28,35 @@ public class UniqueBinarySearchTreesII {
         }
     }
 
-    public List<TreeNode> generateTrees(int n) {
+    private List<TreeNode> buildTree(int lo, int hi) {
         List<TreeNode> result = new ArrayList<>();
-        if (n <= 0) {
+        if (lo > hi) {
+            result.add(null);
             return result;
         }
-        for (int i = 1; i <= n; i++) {
-            TreeNode root = new TreeNode(i);
-            for(int j=1; j<i; j++) {
-                for(int k=n; k>i; k--) {
-                  boolean[] marked = new boolean[n];
-                  marked[i - 1] = true;
-                  marked[j-1] = true;
-                  marked[k-1] = true;
-                  root = buildTree(marked, j, k, root)
-                  result.add(root);        
+        if (lo == hi) {
+            result.add(new TreeNode(lo));
+            return result;
+        }
+        for (int i = lo; i <= hi; i++) {
+            List<TreeNode> leftList = buildTree(lo, i - 1);
+            List<TreeNode> rightList = buildTree(i + 1, hi);
+            for (int j = 0; j < leftList.size(); j++) {
+                for (int k = 0; k < rightList.size(); k++) {
+                    TreeNode root = new TreeNode(i);
+                    root.left = leftList.get(j);
+                    root.right = rightList.get(k);
+                    result.add(root);
                 }
             }
         }
         return result;
     }
 
-    private TreeNode buildBst(boolean[] marked, TreeNode x, int val, int n) {
-        if (x == null) {
-            x = new TreeNode(val);
+    public List<TreeNode> generateTrees(int n) {
+        if (n <= 0) {
+            return new ArrayList<>();
         }
-        for (int i = 1; i < val; i++) {
-            if (!marked[i - 1]) {
-                marked[i - 1] = true;
-                x.left = buildBst(marked, x.left, i, n);
-            }
-        }
-        for (int i = val+1; i <= n; i++) {
-            if (!marked[i - 1]) {
-                marked[i - 1] = true;
-                x.right = buildBst(marked, x.right, i, n);
-            }
-        }
-        return x;
+        return buildTree(1, n);
     }
 }
