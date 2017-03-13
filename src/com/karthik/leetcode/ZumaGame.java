@@ -40,23 +40,13 @@ public class ZumaGame {
         private String b;
         private String g;
         private int dist;
-        //private int[] bcount;
 
-        /*-
-        Game(String b, String g, int dist, int[] bcount) {
-            this.b = b;
-            this.g = g;
-            this.dist = dist;
-            this.bcount = bcount;
-        }
-*/
         Game(String b, String g, int dist) {
             this.b = b;
             this.g = g;
             this.dist = dist;
         }
-        
-        
+
         @Override
         public int hashCode() {
             int h = 7;
@@ -87,42 +77,26 @@ public class ZumaGame {
             return (this.b).equals(other.b) && (this.g).equals(other.g);
         }
     }
-/*-
-    private boolean isAllSameChars(int[] copyBcount) {
-        int count = 0;
-        for (int i = 0; i < copyBcount.length; i++) {
-            if (copyBcount[i] > 0) {
-                count++;
-            }
-        }
-        return count == 1;
-    }
-*/
-    
-    private boolean isAllSame(String x) {
-        char c= x.charAt(0);
-        for(int i=1; i<x.length(); i++) {
-            if(x.charAt(i) != c) {
+
+    private boolean isAllSameChars(String x) {
+        char c = x.charAt(0);
+        for (int i = 1; i < x.length(); i++) {
+            if (c != x.charAt(i)) {
                 return false;
             }
         }
         return true;
     }
-//    private int addNextStep(Queue<Game> q, Set<Game> set, String x, String y, int m, int dist, int[] bcount) {
-       private int addNextStep(Queue<Game> q, Set<Game> set, String x, String y, int m, int dist) {
+
+    private int addNextStep(Queue<Game> q, Set<Game> set, String x, String y, int m, int dist) {
         String p = 'A' + x + 'A';
         char c = y.charAt(m);
         String nexty = y.substring(0, m) + y.substring(m + 1);
         StringBuilder sb = null;
         Game g = null;
-        //int[] copyBcount = null;
         for (int i = 1; i < p.length(); i++) {
             int l = i - 1, r = i;
             sb = new StringBuilder();
-            /*-copyBcount = new int[bcount.length];
-            for (int j = 0; j < copyBcount.length; j++) {
-                copyBcount[j] = bcount[j];
-            }*/
             if (c == p.charAt(l) && c == p.charAt(r)) {
                 while (l > 0 && p.charAt(l) == c) {
                     l--;
@@ -130,22 +104,30 @@ public class ZumaGame {
                 while (r < p.length() - 1 && p.charAt(r) == c) {
                     r++;
                 }
+                while (l > 0 && r < p.length() - 1 && p.charAt(l) == p.charAt(r) && (p.charAt(l - 1) == p.charAt(l) || p.charAt(r + 1) == p.charAt(r))) {
+                    char cp = p.charAt(l);
+                    while (l > 0 && p.charAt(l) == cp) {
+                        l--;
+                    }
+                    while (r < p.length() - 1 && p.charAt(r) == cp) {
+                        r++;
+                    }
+                }
                 sb.append(p.substring(1, l + 1));
-                //copyBcount[map.get(c)] = copyBcount[map.get(c)] - (i - 1 - l) - (r - i);
+            } else if (c != p.charAt(l) && c != p.charAt(r)) {
+                continue;
             } else {
                 sb.append(p.substring(1, l + 1));
                 sb.append(c);
-                //copyBcount[map.get(c)]++;
             }
             sb.append(p.substring(r, p.length() - 1));
             String nextx = sb.toString();
-            if (nextx.length() == 0 || (nextx.length() > 2 && isAllSame(nextx))) {
+            if (nextx.length() == 0 || (nextx.length() > 2 && isAllSameChars(nextx))) {
                 return dist + 1;
             }
             if (nexty.length() == 0) {
                 continue;
             }
-           // g = new Game(sb.toString(), nexty, dist + 1, copyBcount);
             g = new Game(sb.toString(), nexty, dist + 1);
             if (!set.contains(g)) {
                 set.add(g);
@@ -193,7 +175,6 @@ public class ZumaGame {
         while (!q.isEmpty()) {
             Game v = q.remove();
             for (int i = 0; i < v.g.length(); i++) {
-                //int res = addNextStep(q, set, v.b, v.g, i, v.dist, v.bcount);
                 int res = addNextStep(q, set, v.b, v.g, i, v.dist);
                 if (res > -1) {
                     return res;
@@ -204,6 +185,6 @@ public class ZumaGame {
     }
 
     public static void main(String... args) {
-        System.out.println(new ZumaGame().findMinStep("BGGRRYY", "BBYRG"));
+        System.out.println(new ZumaGame().findMinStep("GGRRGRRG", "RRYBB"));
     }
 }
