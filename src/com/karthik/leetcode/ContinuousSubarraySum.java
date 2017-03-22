@@ -10,6 +10,9 @@
  */
 package com.karthik.leetcode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
@@ -47,9 +50,28 @@ public class ContinuousSubarraySum {
         return false;
     }
 
+    public boolean checkSubarraySum2(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1);
+        int n = nums.length, sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += nums[i];
+            if (k != 0) {
+                sum %= k;
+            }
+            Integer value = map.get(sum);
+            if (value == null) {
+                map.put(sum, i);
+            } else if (i - value > 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void main(String... args) {
         ContinuousSubarraySum cc = new ContinuousSubarraySum();
         int input[] = {23, 2, 4, 6, 7};
-        System.out.println(cc.checkSubarraySum(input, 6));
+        System.out.println(cc.checkSubarraySum2(input, 6));
     }
 }
