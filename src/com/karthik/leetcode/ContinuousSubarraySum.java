@@ -20,21 +20,27 @@ public class ContinuousSubarraySum {
         if (nums == null || nums.length == 0) {
             return k == 0;
         }
-        if (k < 0) {
-            k = k * (-1);
-        }
         int n = nums.length;
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < n - i; j++) {
-                int sum = 0;
-                for (int l = j; l < n && l < j + i + 1; l++) {
-                    sum += nums[l];
-                }
-                if (k == 0 && sum == 0) {
+        if (k == 0) {
+            for (int i = 1; i < n; i++) {
+                if (nums[i] == 0 && nums[i] == nums[i - 1]) {
                     return true;
                 }
-                if (k != 0 && sum % k == 0) {
-                    return true;
+            }
+            return false;
+        }
+        k = k < 0 ? -k : k;
+        int lastVal = 0, currVal = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < n; j++) {
+                if (j == i) {
+                    lastVal = nums[j];
+                } else {
+                    currVal = lastVal + nums[j];
+                    if (currVal % k == 0) {
+                        return true;
+                    }
+                    lastVal = currVal;
                 }
             }
         }
