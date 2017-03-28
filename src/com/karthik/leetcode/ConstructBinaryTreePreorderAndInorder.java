@@ -8,9 +8,7 @@
  */
 package com.karthik.leetcode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,27 +28,14 @@ public class ConstructBinaryTreePreorderAndInorder {
         }
     }
 
-    public static void main(String...args) {
-        ConstructBinaryTreePreorderAndInorder cb = new ConstructBinaryTreePreorderAndInorder();
-        cb.buildTree(new int[] {2,1}, new int[] {1,2});
-    }
-    
-    class Multimap {
+    class Result {
 
-        Map<Integer, Integer> m1 = new HashMap<>();
-        Map<Integer, Integer> m2 = new HashMap<>();
+        TreeNode x;
+        int ridx;
 
-        void add(int key, int idx) {
-            m1.put(key, idx);
-            m2.put(idx, key);
-        }
-
-        int getIdx(int key) {
-            return m1.get(key);
-        }
-
-        int getKey(int idx) {
-            return m2.get(idx);
+        Result(TreeNode x, int ridx) {
+            this.x = x;
+            this.ridx = ridx;
         }
     }
 
@@ -59,49 +44,30 @@ public class ConstructBinaryTreePreorderAndInorder {
             return null;
         }
 
-        Multimap pre = new Multimap();
-        for (int i = 0; i < preorder.length; i++) {
-            pre.add(preorder[i], i);
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            map.put(inorder[i], i);
         }
 
-        List<Integer> list = new ArrayList<>();
-        for (int x : inorder) {
-            list.add(x);
-        }
-        return buildTree(pre, 0, null, list);
+        Result res = tree(map, 0, preorder, 0, inorder.length - 1, null);
+        return res.x;
     }
 
-    private TreeNode buildTree(Multimap pre, Integer pi, TreeNode x, List<Integer> list) {
-        int root = pre.getKey(pi);
+    private Result tree(Map<Integer, Integer> map, int pi, int[] preorder, int lo, int hi, TreeNode x) {
+        if (lo > hi || pi >= preorder.length) {
+            return new Result(null, pi);
+        }
         if (x == null) {
-            x = new TreeNode(root);
+            x = new TreeNode(preorder[pi]);
         }
-        if (list.size() == 1) {
-            return x;
+        if (lo == hi) {
+            return new Result(x, pi + 1);
         }
-        List<Integer> leftChld = new ArrayList<>();
-        List<Integer> rightChld = new ArrayList<>();
-        List<Integer> ptr = leftChld;
-        Integer lidx = null, ridx = null, idx = null;
-        for (int key : list) {
-            if (key == root) {
-                ptr = rightChld;
-                lidx = idx;
-                idx = null;
-            } else {
-                ptr.add(key);
-                if (idx==null || pre.getIdx(key) < idx) {
-                    idx = pre.getIdx(key);
-                }
-            }
-        }
-        ridx = idx;
-        if (lidx!=null) {
-            x.left = buildTree(pre, lidx, null, leftChld);
-        }
-        if (ridx!=null) {
-            x.right = buildTree(pre, ridx, null, rightChld);
-        }
-        return x;
+        int mid = map.get(preorder[pi]);
+        Result left = tree(map, ++pi, preorder, lo, mid - 1, null);
+        x.left = left.x;
+        Result right = tree(map, left.ridx, preorder, mid + 1, hi, null);
+        x.right = right.x;
+        return new Result(x, right.ridx);
     }
 }
