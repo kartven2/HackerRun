@@ -15,6 +15,9 @@ public class RectangleArea {
     public int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
         int rectArea = (((C - A) * (D - B)) + ((G - E) * (H - F)));
         int intersectArea = ((Math.min(G, C) - Math.max(A, E)) * (Math.min(D, H) - Math.max(F, B)));
-
+        if (C <= E || G <= A || F >= D || B >= H) {
+            return rectArea;
+        }
+        return rectArea - intersectArea;
     }
 }
