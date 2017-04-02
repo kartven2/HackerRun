@@ -42,9 +42,34 @@ public class SearchRotatedSortedArray {
         }
     }
 
+    public int search2(int[] a, int target) {
+        if (a == null || a.length == 0) {
+            return -1;
+        }
+        int lo = 0, hi = a.length - 1, mid = 0;
+        while (lo <= hi) {
+            mid = (lo + hi) >> 1;
+            if (a[mid] == target) {
+                return mid;
+            }
+            if (a[lo] <= a[mid]) {
+                if (target >= a[lo] && target < a[mid]) {
+                    hi = mid - 1;
+                } else {
+                    lo = mid + 1;
+                }
+            } else if (target <= a[hi] && target > a[mid]) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        return -1;
+    }
+
     public static void main(String... args) {
         SearchRotatedSortedArray srsa = new SearchRotatedSortedArray();
-        int[] nums = {3, 4, 5, 6, 1, 2};
-        System.out.println(srsa.search(nums, 2));
+        int[] nums = {5, 1, 2, 3, 4};
+        System.out.println(srsa.search2(nums, 1));
     }
 }
