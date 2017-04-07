@@ -16,6 +16,9 @@
  */
 package com.karthik.leetcode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
@@ -26,11 +29,20 @@ public class MatchsticksSquare {
         if (nums == null || nums.length == 0) {
             return false;
         }
-        int max = nums[0], n = nums.length;
-        for (int i = 1; i < n; i++) {
+        int max = -1, n = nums.length;
+        Map<Integer, Integer> count = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            Integer x = count.get(nums[i]);
+            if (x == null) {
+                x = 0;
+            }
+            count.put(nums[i], x + 1);
             if (max > nums[i]) {
                 max = nums[i];
             }
+        }
+        if (count.get(max) > 4 || count.get(max) == 4 && n > 4) {
+            return false;
         }
     }
 }
