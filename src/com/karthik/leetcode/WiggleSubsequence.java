@@ -32,8 +32,39 @@ package com.karthik.leetcode;
  */
 public class WiggleSubsequence {
 
+    public int wiggleMaxLength2(int[] a) {
+        if (a == null) {
+            return 0;
+        }
+        if (a.length < 2) {
+            return a.length;
+        }
+        int n = a.length;
+        int[] up = new int[n];
+        int[] down = new int[n];
+        up[0] = 1;
+        down[0] = 1;
+        for (int i = 1; i < n; i++) {
+            if (a[i] - a[i - 1] > 0) {
+                up[i] = down[i - 1] + 1;
+                down[i] = down[i - 1];
+            } else if (a[i] - a[i - 1] < 0) {
+                down[i] = up[i - 1] + 1;
+                up[i] = up[i - 1];
+            } else {
+                up[i] = up[i - 1];
+                down[i] = down[i - 1];
+            }
+        }
+
+        return Math.max(up[n - 1], down[n - 1]);
+    }
+
     public int wiggleMaxLength(int[] nums) {
-        if (nums == null || nums.length < 2) {
+        if (nums == null) {
+            return 0;
+        }
+        if (nums.length < 2) {
             return nums.length;
         }
         int n = nums.length;
