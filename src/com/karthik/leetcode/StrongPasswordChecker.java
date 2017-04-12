@@ -24,43 +24,69 @@ public class StrongPasswordChecker {
         if (s == null || s.length() == 0) {
             return 6;
         }
-        int n = s.length(), ans = n < 6 ? 6 - n : n > 20 ? n - 20 : 0;
-        boolean lc = false, uc = false, dc = false;
-        int triples = 0, st = 1;
+        int n = s.length(), st = 1;
+        boolean lc = false, dc = false, uc = false;
+        int[] dp = new int[n + 1];
+        int[] need = new int[n + 1];
+        boolean[] tp = new boolean[n + 1];
+        dp[0] = 6;
+        need[0] = 3;
         for (int i = 0; i < n; i++) {
             char c = s.charAt(i);
-            if (c >= 'a' && c <= 'z') {
-                lc = true;
-            } else if (c >= 'A' && c <= 'Z') {
-                uc = true;
-            } else if (c >= '0' && c <= '9') {
-                dc = true;
+            int v = getCharVal(c);
+            need[i + 1] = need[i];
+            switch (v) {
+                case 0:
+                    if (!lc) {
+                        lc = true;
+                        need[i + 1] = need[i] - 1;
+                    }
+                    break;
+                case 1:
+                    if (!uc) {
+                        uc = true;
+                        need[i + 1] = need[i] - 1;
+                    }
+                    break;
+                case 2:
+                    if (!dc) {
+                        dc = true;
+                        need[i + 1] = need[i] - 1;
+                    }
+                    break;
+                default:
+                    break;
             }
-            if (i > 0 && c == s.charAt(i - 1)) {
-                st++;
-            } else {
-                if (st > 3) {
-                    triples += (st / 3);
+            if (v > -1) {
+                if (c == s.charAt(i - 1) && st == 2) {
+                    tp[i + 1] = true;
+                    st = 0;
+                } else if (c == s.charAt(i - 1)) {
+                    st++;
+                } else {
+                    st = 1;
                 }
-                st = 1;
+            } else {
+                st = 0;
+            }
+            if (i < 6) {
+                dp[i + 1] = Math.max(dp[i] - 1, need[i + 1]);
+            } else if (i >= 6 && i <= 20) {
             }
         }
-        int need = triples;
-        if (!lc) {
-            need++;
+        return dp[n];
+    }
+
+    private int getCharVal(char c) {
+        if (c >= 'a' && c <= 'z') {
+            return 0;
         }
-        if (!uc) {
-            need++;
+        if (c >= 'A' && c <= 'Z') {
+            return 1;
         }
-        if (!dc) {
-            need++;
+        if (c >= '0' && c <= '9') {
+            return 2;
         }
-        if(n>=6 && n<=20) {
-          return need;            
-        } else if(n<6) {
-            return ans;
-        }
-        
-        
+        return -1;
     }
 }
