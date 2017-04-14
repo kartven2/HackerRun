@@ -22,7 +22,7 @@ public class StrongPasswordChecker {
 
     public static void main(String... args) {
         StrongPasswordChecker sp = new StrongPasswordChecker();
-        String s = "aaaabaaaaaaacaaaaaaaaaa";
+        String s = "aaaabaaaaacaaaaaadA1aaabcdefghih";
         System.out.println(sp.strongPasswordChecker(s));
         System.out.println(sp.strongPasswordChecker2(s));
     }
