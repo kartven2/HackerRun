@@ -9,6 +9,7 @@ package com.karthik.leetcode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * @author Karthik Venkataraman
@@ -18,7 +19,7 @@ public class LetterCombinationsPhoneNumber {
 
     public static void main(String... args) {
         LetterCombinationsPhoneNumber lcp = new LetterCombinationsPhoneNumber();
-        lcp.letterCombinations("23");
+        lcp.letterCombinations2("23");
     }
 
     public List<String> letterCombinations(String digits) {
@@ -42,4 +43,26 @@ public class LetterCombinationsPhoneNumber {
         }
     }
 
+    public List<String> letterCombinations2(String digits) {
+        List<String> result = new ArrayList<>();
+        if (digits == null || digits.length() == 0) {
+            return result;
+        }
+        String[] map = {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        Stack<String> stk = new Stack<>();
+        int n = digits.length();
+        stk.push("");
+        while (!stk.isEmpty()) {
+            String x = stk.pop();
+            if (x.length() == digits.length()) {
+                result.add(x);
+                continue;
+            }
+            String y = map[digits.charAt(x.length()) - '2'];
+            for (int j = 0; j < y.length(); j++) {
+                stk.push(x + y.charAt(j));
+            }
+        }
+        return result;
+    }
 }
