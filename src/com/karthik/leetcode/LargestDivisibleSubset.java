@@ -7,11 +7,8 @@
 package com.karthik.leetcode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -46,6 +43,47 @@ public class LargestDivisibleSubset {
             result.add(a[0]);
             return result;
         }
-        int n = a.length, max = -1;
+        int n = a.length;
+        Arrays.sort(a);
+        int[] p = new int[n];
+        int[] l = new int[n];
+        int maxIdx = -1, maxLen = -1;
+        for (int i = 0; i < n; i++) {
+            if (isPrime(a[i])) {
+                if (a[0] == 1 && i > 0) {
+                    p[i] = 0;
+                    l[i] = l[0] + 1;
+                } else {
+                    p[i] = i;
+                    l[i] = 1;
+                }
+            } else {
+                boolean foundParent = false;
+                for (int j = i - 1; j >= 0; j--) {
+                    if (a[i] % a[j] == 0) {
+                        if (1 + l[j] > l[i]) {
+                            foundParent = true;
+                            l[i] = l[j] + 1;
+                            p[i] = j;
+                        }
+                    }
+                }
+                if (!foundParent) {
+                    l[i] = 1;
+                    p[i] = i;
+                }
+            }
+            if (l[i] > maxLen) {
+                maxLen = l[i];
+                maxIdx = i;
+            }
+        }
+        int x = maxIdx;
+        while (x != p[x]) {
+            result.add(a[x]);
+            x = p[x];
+        }
+        result.add(a[x]);
+        return result;
     }
 }
