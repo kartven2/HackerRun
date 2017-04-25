@@ -17,6 +17,33 @@ package com.karthik.leetcode;
  */
 public class HouseRobberII {
 
+    public int rob2(int[] a) {
+        if (a == null || a.length == 0) {
+            return 0;
+        }
+        int n = a.length;
+        if (n < 4) {
+            int max = -1;
+            for (int i = 0; i < n; i++) {
+                if (a[i] > max) {
+                    max = a[i];
+                }
+            }
+            return max;
+        }
+        return Math.max(dp(a, 0, n - 2), dp(a, 1, n - 1));
+    }
+
+    private int dp(int[] a, int lo, int hi) {
+        int c = 0, pr = 0, pr2 = 0;
+        for (int i = lo; i <= hi; i++) {
+            c = Math.max(pr2 + a[i], pr);
+            pr2 = pr;
+            pr = c;
+        }
+        return c;
+    }
+
     public int rob(int[] nums) {
         if (nums == null || nums.length == 0) {
             return 0;
