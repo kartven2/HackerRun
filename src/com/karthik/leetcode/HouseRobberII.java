@@ -21,12 +21,34 @@ public class HouseRobberII {
         if (nums == null || nums.length == 0) {
             return 0;
         }
-        if (nums.length == 1) {
-            return nums[0];
+        int n = nums.length, max = -1;
+        if (n < 4) {
+            for (int i = 0; i < n; i++) {
+                if (nums[i] > max) {
+                    max = nums[i];
+                }
+            }
+            return max;
         }
-        if (nums.length == 2) {
-            return Math.max(nums[0], nums[1]);
+        if (n == 4) {
+            return Math.max(nums[0] + nums[2], nums[1] + nums[3]);
         }
-        int n = nums.length;
+        int useFirst = 0, useLast = 0, c = 0, pr = 0, pr2 = 0;
+        for (int i = 0; i < n - 1; i++) {
+            c = Math.max(pr2 + nums[i], pr);
+            pr2 = pr;
+            pr = c;
+        }
+        useFirst = c;
+        c = 0;
+        pr = 0;
+        pr2 = 0;
+        for (int i = 1; i < n; i++) {
+            c = Math.max(nums[i] + pr2, pr);
+            pr2 = pr;
+            pr = c;
+        }
+        useLast = c;
+        return Math.max(useFirst, useLast);
     }
 }
