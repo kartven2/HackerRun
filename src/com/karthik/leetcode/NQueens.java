@@ -31,6 +31,59 @@ public class NQueens {
         }
     }
 
+    public List<List<String>> solveNQueens2(int n) {
+        List<List<String>> result = new ArrayList<>();
+        if (n <= 0 || n > 1 && n < 4) {
+            return result;
+        }
+        if (n == 1) {
+            List<String> sub = new ArrayList<>();
+            sub.add("Q");
+            result.add(sub);
+            return result;
+        }
+        int[] col = new int[n];
+        play(result, 0, n, col);
+        return result;
+    }
+
+    private void play(List<List<String>> result, int r, int n, int[] col) {
+        if (r == n) {
+            List<String> sub = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                StringBuilder sb = new StringBuilder();
+                int j = 0;
+                for (; j < col[i]; j++) {
+                    sb.append(".");
+                }
+                sb.append("Q");
+                for (j = col[i] + 1; j < n; j++) {
+                    sb.append(".");
+                }
+                sub.add(sb.toString());
+            }
+            result.add(sub);
+            return;
+        }
+        boolean[] row = new boolean[n];
+        for (int i = 0; i < r; i++) {
+            row[col[i]] = true;
+            if (col[i] + (r - i) < n) {
+                row[col[i] + (r - i)] = true;
+            }
+            if (col[i] - (r - i) >= 0) {
+                row[col[i] - (r - i)] = true;
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (!row[i]) {
+                col[r] = i;
+                play(result, r + 1, n, col);
+                col[r] = 0;
+            }
+        }
+    }
+
     public List<List<String>> solveNQueens(int n) {
         List<List<String>> result = new ArrayList<>();
         if (n <= 0 || n > 1 && n < 4) {
