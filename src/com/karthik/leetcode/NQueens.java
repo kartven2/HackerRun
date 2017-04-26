@@ -65,11 +65,11 @@ public class NQueens {
         Set<Integer> skpset = new HashSet<>();
         for (int i = 0; i < r; i++) {
             skpset.add(skip[i]);
-            if (skip[i] + r < n) {
-                skpset.add(skip[i] + r);
+            if (skip[i] + (r - i) < n) {
+                skpset.add(skip[i] + (r - i));
             }
-            if (skip[i] - r >= 0) {
-                skpset.add(skip[i] - r);
+            if (skip[i] - (r - i) >= 0) {
+                skpset.add(skip[i] - (r - i));
             }
         }
         for (int c = 0; c < n; c++) {
