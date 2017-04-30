@@ -20,17 +20,33 @@ package com.karthik.leetcode;
 public class SuperWashingMachines {
 
     public int findMinMoves(int[] a) {
-         if(a==null || a.length==0) {
-             return 0;
-         }
-         int n = a.length;
-         long sum = 0;
-         for(int i=0; i<n; i++) {
-             sum+=a[i];
-         }
-         if(sum%n>0) {
-             return -1;
-         }
-         int mean = (int) (sum/n);
+        if (a == null || a.length < 2) {
+            return 0;
+        }
+        int n = a.length;
+        long sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += a[i];
+        }
+        if (sum % n > 0) {
+            return -1;
+        }
+        int mean = (int) (sum / n);
+        int[] diff = new int[n];
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+            diff[i] = a[i] - mean;
+            if (diff[i] > max) {
+                max = diff[i];
+            }
+        }
+        max = Math.abs(diff[0]) > max ? Math.abs(diff[0]) : max;
+        for (int i = 1; i < n; i++) {
+            diff[i] += diff[i - 1];
+            if (Math.abs(diff[i]) > max) {
+                max = Math.abs(diff[i]);
+            }
+        }
+        return max;
     }
 }
