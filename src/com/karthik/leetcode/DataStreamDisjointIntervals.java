@@ -6,6 +6,7 @@
  */
 package com.karthik.leetcode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class DataStreamDisjointIntervals {
 
-    class Interval {
+    static class Interval {
 
         int start;
         int end;
@@ -30,91 +31,139 @@ public class DataStreamDisjointIntervals {
         }
     }
 
-    class SummaryRanges {
+    static class SummaryRanges {
 
-        class Node {
+        static class Node {
 
-            private Interval intvl;
-            private Node left, right;
+            private int[] v;
+            Node left, right;
 
-            Node(Interval intvl) {
-                this.intvl = intvl;
+            Node(int[] v) {
+                this.v = v;
             }
         }
-
         private Node root;
+        private List<Interval> result;
 
         public SummaryRanges() {
-
-        }
-
-        public void addNum(int val) {
-            root = buildTree(root, val);
-        }
-
-        private Node buildTree(Node x, int v) {
-            if (x == null) {
-                x = new Node(new Interval(v, v));
-            }
-            if (v >= x.intvl.start && v <= x.intvl.end) {
-                return x;
-            } else if (v + 1 < x.intvl.start) {
-                x.left = buildTree(x.left, v);
-            } else if (v - 1 > x.intvl.end) {
-                x.right = buildTree(x.right, v);
-            } else if (v + 1 == x.intvl.start) {
-                x.intvl.start = v;
-                x.left = merge(x, x.left);
-            } else if (v - 1 == x.intvl.end) {
-                x.intvl.end = v;
-                x.right = merge(x, x.right);
-            }
-            return x;
-        }
-
-        private void removeMin() {
-            if (root == null) {
-                return;
-            }
-            root = removeMin(root);
-        }
-
-        private Node removeMin(Node x) {
-            if (x.left == null) {
-                return x.right;
-            }
-            x.left = removeMin(x.left);
-            return x;
-        }
-
-        private void delMin() {
-            if (root == null) {
-                return;
-            }
-            if (root.left == null) {
-                root = root.right;
-                return;
-            }
-            delMin(root);
-        }
-
-        private void delMin(Node x) {
-            Node p = null;
-            while (x.left != null) {
-                p = x;
-                x = x.left;
-            }
-            if (x.right == null) {
-                p.left = null;
-                x = null;
-                return;
-            }
-            p.left = x.right;
-            x = null;
+            result = new ArrayList<>();
+            root = null;
         }
 
         public List<Interval> getIntervals() {
+            result.clear();
+            inorder(root);
+            return result;
+        }
 
+        private void inorder(Node x) {
+            if (x == null) {
+                return;
+            }
+            inorder(x.left);
+            result.add(new Interval(x.v[0], x.v[1]));
+            inorder(x.right);
+        }
+
+        public void addNum(int val) {
+            root = build(root, val);
+        }
+
+        private Node build(Node x, int val) {
+            if (x == null) {
+                int[] arr = {val, val};
+                x = new Node(arr);
+            }
+            if (val >= x.v[0] && val <= x.v[1]) {
+                return x;
+            } else if (val + 1 < x.v[0]) {
+                x.left = build(x.left, val);
+            } else if (val - 1 > x.v[1]) {
+                x.right = build(x.right, val);
+            } else if (val + 1 == x.v[0]) {
+                x.v[0] = val;
+                Node y = find(root, val - 1, 1);
+                if (y == null) {
+                    return x;
+                }
+                int key = y.v[0];
+                delete(key);
+                x.v[0] = key;
+            } else if (val - 1 == x.v[1]) {
+                x.v[1] = val;
+                Node y = find(root, val + 1, 0);
+                if (y == null) {
+                    return x;
+                }
+                int key = y.v[1];
+                delete(y.v[0]);
+                x.v[1] = key;
+            }
+            return x;
+        }
+
+        private Node find(Node x, int key, int idx) {
+            if (x == null) {
+                return null;
+            }
+            if (key == x.v[idx]) {
+                return x;
+            } else if (key > x.v[idx]) {
+                return find(x.right, key, idx);
+            } else {
+                return find(x.left, key, idx);
+            }
+        }
+
+        private Node min(Node x) {
+            if (x == null) {
+                return null;
+            }
+            while (x.left != null) {
+                x = x.left;
+            }
+            return x;
+        }
+
+        private Node delMin(Node x) {
+            if (x == null) {
+                return null;
+            }
+            if (x.left == null) {
+                return x.right;
+            }
+            x.left = delMin(x.left);
+            return x;
+        }
+
+        private void delete(int key) {
+            if (root == null) {
+                return;
+            }
+            root = delete(key, root);
+        }
+
+        private Node delete(int key, Node x) {
+            if (x == null) {
+                return null;
+            }
+            if (x.v[0] < key) {
+                x.right = delete(key, x.right);
+            } else if (x.v[0] > key) {
+                x.left = delete(key, x.left);
+            } else {
+                if (x.left == null) {
+                    return x.right;
+                }
+                if (x.right == null) {
+                    return x.left;
+                }
+                Node t = x;
+                x = min(t.right);
+                x.right = delMin(t.right);
+                x.left = t.left;
+            }
+            return x;
         }
     }
 }
