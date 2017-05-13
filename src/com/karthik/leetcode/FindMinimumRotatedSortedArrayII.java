@@ -13,6 +13,24 @@ package com.karthik.leetcode;
  */
 public class FindMinimumRotatedSortedArrayII {
 
+    public int findMin2(int[] a) {
+        if(a==null || a.length==0) {
+            return 0;
+        }
+        int lo=0, hi=a.length-1, mid=0;
+        while(lo<hi) {
+            mid = lo+(hi-lo)/2;
+            if(a[mid]>a[hi]) {
+                lo = mid+1;
+            } else if(a[mid]<a[hi]) {
+                hi = mid;
+            } else {
+                hi--;
+            }
+        }
+        return a[lo];
+    }
+
     public int findMin(int[] a) {
         if (a == null || a.length == 0) {
             return 0;
