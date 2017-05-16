@@ -5,6 +5,9 @@
  */
 package com.karthik.leetcode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
@@ -15,19 +18,18 @@ public class ContiguousArray {
         if (a == null || a.length == 0) {
             return 0;
         }
-        int n = a.length, cnt = 0, max = 0, st = 0;
-        boolean dir = a[0] == 1;
+        int n = a.length, cnt = 0, max = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1);
         for (int i = 0; i < n; i++) {
             cnt = a[i] == 1 ? cnt + 1 : cnt - 1;
-            if (!(dir && a[i] == 1)) {
-                dir = !dir;
-                st++;
-                if (cnt == 0) {
-                    if (max < 2 * st) {
-                        max = 2 * st;
-                    }
-                    st = 0;
+            Integer x = map.get(cnt);
+            if (x != null) {
+                if (max < i - x) {
+                    max = i - x;
                 }
+            } else {
+                map.put(cnt, i);
             }
         }
         return max;
