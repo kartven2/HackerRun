@@ -16,7 +16,7 @@ public class RollADice {
         for (int i = 0; i <= 10; i++) {
             System.out.println("For " + i + "---" + ra.rollADice2(i));
         }
-        System.out.println("For " + 610 + "---" + ra.rollADice(610));
+        System.out.println("For " + 610 + "---" + ra.rollADice2(610));
     }
 
     private int rollADice(int n) {
