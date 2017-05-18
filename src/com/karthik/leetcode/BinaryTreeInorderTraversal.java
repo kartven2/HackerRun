@@ -26,6 +26,31 @@ public class BinaryTreeInorderTraversal {
         }
     }
 
+    public List<Integer> inorderTraversal2(TreeNode root) {
+        List<Integer> list = new LinkedList<>();
+        if (root == null) {
+            return list;
+        }
+        Stack<TreeNode> stk = new Stack<>();
+        TreeNode x = root;
+        while (x != null) {
+            stk.push(x);
+            x = x.left;
+        }
+        while (!stk.isEmpty()) {
+            TreeNode y = stk.pop();
+            list.add(y.val);
+            if (y.right != null) {
+                x = y.right;
+                while (x != null) {
+                    stk.push(x);
+                    x = x.left;
+                }
+            }
+        }
+        return list;
+    }
+
     public List<Integer> inorderTraversal(TreeNode x) {
         List<Integer> list = new LinkedList<>();
         if (x == null) {
