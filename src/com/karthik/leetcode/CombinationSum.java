@@ -26,11 +26,11 @@ public class CombinationSum {
             return result;
         }
         Arrays.sort(a);
-        build(a, result, x, x, new LinkedList<>(), 0);
+        build(a, result, x, new LinkedList<>(), 0);
         return result;
     }
 
-    private void build(int[] a, List<List<Integer>> result, int x, int tgt, List<Integer> sub, int start) {
+    private void build(int[] a, List<List<Integer>> result, int x, List<Integer> sub, int start) {
         if (x == 0) {
             result.add(sub);
             return;
@@ -42,7 +42,7 @@ public class CombinationSum {
             if (x - a[j] >= 0) {
                 List<Integer> list = new LinkedList<>(sub);
                 list.add(a[j]);
-                build(a, result, x - a[j], tgt, list, j);
+                build(a, result, x - a[j], list, j);
             }
         }
     }

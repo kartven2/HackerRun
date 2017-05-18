@@ -12,6 +12,7 @@ package com.karthik.leetcode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -19,6 +20,36 @@ import java.util.List;
  * @email kafy83@gmail.com
  */
 public class CombinationSumII {
+
+    public List<List<Integer>> combinationSum(int[] a, int tgt) {
+        List<List<Integer>> result = new LinkedList<>();
+        if (a == null || a.length == 0) {
+            return result;
+        }
+        Arrays.sort(a);
+        build(result, a, tgt, 0, new LinkedList<>());
+        return result;
+    }
+
+    private void build(List<List<Integer>> result, int[] a, int x, int start, List<Integer> list) {
+        if (x == 0) {
+            result.add(list);
+            return;
+        }
+        if (start >= a.length || x < a[start]) {
+            return;
+        }
+        for (int i = start; i < a.length; i++) {
+            if (i > start && a[i] == a[i - 1]) {
+                continue;
+            }
+            if (x - a[i] >= 0) {
+                List<Integer> sub = new LinkedList<>(list);
+                sub.add(a[i]);
+                build(result, a, x - a[i], i + 1, sub);
+            }
+        }
+    }
 
     public List<List<Integer>> combinationSum2(int[] c, int t) {
         List<List<Integer>> result = new ArrayList<>();
