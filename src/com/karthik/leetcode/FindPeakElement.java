@@ -14,6 +14,25 @@ package com.karthik.leetcode;
  */
 public class FindPeakElement {
 
+    public int findPeakElement3(int[] a) {
+        if (a == null || a.length == 0) {
+            return -1;
+        }
+        int n = a.length;
+        int[] b = new int[n + 2];
+        b[0] = Integer.MIN_VALUE;
+        b[b.length - 1] = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+            b[i + 1] = a[i];
+        }
+        for (int i = 1; i < b.length - 1; i++) {
+            if (b[i] > b[i - 1] && b[i] > b[i + 1]) {
+                return i - 1;
+            }
+        }
+        return 0;
+    }
+
     public int findPeakElement2(int[] a) {
         if (a == null || a.length == 0) {
             return -1;
