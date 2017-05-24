@@ -68,6 +68,24 @@ public class PrimeCount {
         }
     }
 
+    private boolean isPrime(int x) {
+        if (x < 4) {
+            return true;
+        }
+        if (x % 2 == 0 || x % 3 == 0) {
+            return false;
+        }
+        int i = 5, w = 2;
+        while (i * i <= x) {
+            if (x % i == 0) {
+                return false;
+            }
+            i += w;
+            w = 6 - w;
+        }
+        return true;
+    }
+
     private void segmentedSieve(int x) {
         if (x < 2) {
             printOutput(primes);
