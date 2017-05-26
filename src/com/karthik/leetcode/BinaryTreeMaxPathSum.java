@@ -46,43 +46,43 @@ public class BinaryTreeMaxPathSum {
         if (x.left == null && x.right == null) {
             return x.val;
         }
-        if(x.left == null) {
+        if (x.left == null) {
             return dfs(x.right, x.val, x.val);
         }
-        if(x.right == null) {
+        if (x.right == null) {
             return dfs(x.left, x.val, x.val);
         }
         int lmax = dfs(x.left, x.val, x.val);
         int rmax = dfs(x.right, x.val, x.val);
-        if(x.val<0) {
-            return max(lmax, rmax);
+        if (x.val < 0) {
+            return max(lmax, rmax, lmax + rmax + x.val);
         }
         return lmax + rmax - x.val;
     }
 
     private int dfs(TreeNode x, int curr, int max) {
         if (x.left == null && x.right == null) {
-            curr = max(curr, x.val, curr + x.val);
+            curr = max(curr, curr + x.val, x.val);
             return max(max, curr);
         }
         if (x.left == null) {
             if (x.val < 0) {
                 max = max(curr, max, x.val);
             }
-            curr = max(curr, x.val, curr + x.val);
+            curr = max(0, curr + x.val, x.val);
             return dfs(x.right, curr, max);
         }
         if (x.right == null) {
-            if (curr + x.val < 0) {
+            if (x.val < 0) {
                 max = max(curr, max, x.val);
             }
-            curr = max(curr, x.val, curr + x.val);
+            curr = max(0, curr + x.val, x.val);
             return dfs(x.left, curr, max);
         }
-        if (curr + x.val < 0) {
+        if (x.val < 0) {
             max = max(curr, max, x.val);
         }
-        curr = max(curr, x.val, curr + x.val);
+        curr = max(0, curr + x.val, x.val);
         int lmax = dfs(x.left, curr, max);
         int rmax = dfs(x.right, curr, max);
         return max(lmax, rmax, max);
