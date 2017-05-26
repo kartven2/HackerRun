@@ -20,6 +20,92 @@ public class BinaryTreeMaxPathSum {
 
     private static final int MIN = Integer.MIN_VALUE;
 
+    public static class TreeNode {
+
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
+        }
+    }
+
+    private int max(int a, int b) {
+        return a > b ? a : b;
+    }
+
+    private int max(int a, int b, int c) {
+        return a > b && a > c ? a : b > c ? b : c;
+    }
+
+    public int maxPathSum(TreeNode x) {
+        if (x == null) {
+            return 0;
+        }
+        if (x.left == null && x.right == null) {
+            return x.val;
+        }
+        if(x.left == null) {
+            return dfs(x.right, x.val, x.val);
+        }
+        if(x.right == null) {
+            return dfs(x.left, x.val, x.val);
+        }
+        int lmax = dfs(x.left, x.val, x.val);
+        int rmax = dfs(x.right, x.val, x.val);
+        if(x.val<0) {
+            return max(lmax, rmax);
+        }
+        return lmax + rmax - x.val;
+    }
+
+    private int dfs(TreeNode x, int curr, int max) {
+        if (x.left == null && x.right == null) {
+            curr = max(curr, x.val, curr + x.val);
+            return max(max, curr);
+        }
+        if (x.left == null) {
+            if (x.val < 0) {
+                max = max(curr, max, x.val);
+            }
+            curr = max(curr, x.val, curr + x.val);
+            return dfs(x.right, curr, max);
+        }
+        if (x.right == null) {
+            if (curr + x.val < 0) {
+                max = max(curr, max, x.val);
+            }
+            curr = max(curr, x.val, curr + x.val);
+            return dfs(x.left, curr, max);
+        }
+        if (curr + x.val < 0) {
+            max = max(curr, max, x.val);
+        }
+        curr = max(curr, x.val, curr + x.val);
+        int lmax = dfs(x.left, curr, max);
+        int rmax = dfs(x.right, curr, max);
+        return max(lmax, rmax, max);
+    }
+
+    public static void main(String... args) {
+        BinaryTreeMaxPathSum bt = new BinaryTreeMaxPathSum();
+        /*TreeNode root = new TreeNode(5);
+        root.left = new TreeNode(4);
+        root.left.left = new TreeNode(11);
+        root.left.left.left = new TreeNode(7);
+        root.left.left.right = new TreeNode(2);
+        root.right = new TreeNode(8);
+        root.right.left = new TreeNode(13);
+        root.right.right = new TreeNode(4);
+        root.right.right.left = new TreeNode(1);*/
+        TreeNode root = new TreeNode(-1);
+        root.left = new TreeNode(0);
+        root.right = new TreeNode(1);
+        bt.maxPathSum(root);
+    }
+    
+    
     class Tree {
 
         private int getCapacity(int size) {
@@ -202,10 +288,5 @@ public class BinaryTreeMaxPathSum {
         //String output = tree.arr[i]==null ? i+" ":i+" "+tree.arr[i].toString();
         //System.out.println(output);
         //}
-    }
-
-    public static void main(String... args) {
-        BinaryTreeMaxPathSum bt = new BinaryTreeMaxPathSum();
-        bt.compute();
     }
 }
