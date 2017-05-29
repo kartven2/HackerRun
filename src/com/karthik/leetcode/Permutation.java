@@ -13,8 +13,17 @@ public class Permutation {
 
     public static void main(String... args) {
         Permutation p = new Permutation();
-        p.permute(3);
+        long startTime = System.nanoTime();
+        p.permute(5, true);
         System.out.println("Total : " + p.count);
+        long duration = System.nanoTime() - startTime;
+        System.out.println("Duration : " + duration + " nano secs");
+        p.count = 0;
+        startTime = System.nanoTime();
+        p.permute(5, false);
+        System.out.println("Total : " + p.count);
+        duration = System.nanoTime() - startTime;
+        System.out.println("Duration : " + duration + " nano secs");
     }
 
     private void printPermutation(int[] a) {
@@ -27,12 +36,16 @@ public class Permutation {
         System.out.println(sb.toString());
     }
 
-    private void permute(int n) {
+    private void permute(int n, boolean tc) {
         int[] a = new int[n];
         for (int i = 0; i < n; i++) {
             a[i] = i + 1;
         }
-        build(a, 0, n);
+        if (tc) {
+            build(a, 0, n);
+        } else {
+            build2(a, 0, n);
+        }
     }
 
     private void swap(int[] a, int i, int j) {
@@ -41,7 +54,19 @@ public class Permutation {
         a[j] = tmp;
     }
 
-    private void build(int[] a, int start, int n) {
+    private void build(int[] a, int i, int n) {
+        if (i == n - 1) {
+            printPermutation(a);
+            return;
+        }
+        for (int j = i; j < n; j++) {
+            swap(a, i, j);
+            build(a, i + 1, n);
+            swap(a, i, j);
+        }
+    }
+
+    private void build2(int[] a, int start, int n) {
         printPermutation(a);
         for (int i = start; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
