@@ -32,6 +32,26 @@ public class PopulatingNextRightPointersEachNode {
         }
     }
 
+    public void connect(TreeLinkNode root) {
+        if (root == null) {
+            return;
+        }
+        TreeLinkNode l = root;
+        while (l != null) {
+            TreeLinkNode p = l;
+            while (p != null) {
+                if (p.left != null) {
+                    p.left.next = p.right;
+                }
+                if (p.right != null && p.next != null) {
+                    p.right.next = p.next.left;
+                }
+                p = p.next;
+            }
+            l = l.left;
+        }
+    }
+
     public void connect2(TreeLinkNode root) {
         List<List<TreeLinkNode>> list = new LinkedList<>();
         build(root, 0, list);
@@ -56,7 +76,7 @@ public class PopulatingNextRightPointersEachNode {
         build(x.right, lvl + 1, list);
     }
 
-    public void connect(TreeLinkNode x) {
+    public void connect3(TreeLinkNode x) {
         if (x == null) {
             return;
         }
