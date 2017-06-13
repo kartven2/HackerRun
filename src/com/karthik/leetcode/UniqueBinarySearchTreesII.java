@@ -9,6 +9,7 @@
 package com.karthik.leetcode;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,6 +27,39 @@ public class UniqueBinarySearchTreesII {
         TreeNode(int x) {
             val = x;
         }
+    }
+
+    public List<TreeNode> generateTrees2(int n) {
+        List<TreeNode> result = new LinkedList<>();
+        if (n <= 0) {
+            return result;
+        }
+        return build(1, n);
+    }
+
+    private List<TreeNode> build(int lo, int hi) {
+        List<TreeNode> result = new LinkedList<>();
+        if (lo > hi) {
+            result.add(null);
+            return result;
+        }
+        if (lo == hi) {
+            result.add(new TreeNode(lo));
+            return result;
+        }
+        for (int i = lo; i <= hi; i++) {
+            List<TreeNode> leftTree = build(lo, i - 1);
+            List<TreeNode> rightTree = build(i + 1, hi);
+            for (TreeNode l : leftTree) {
+                for (TreeNode r : rightTree) {
+                    TreeNode root = new TreeNode(i);
+                    root.left = l;
+                    root.right = r;
+                    result.add(root);
+                }
+            }
+        }
+        return result;
     }
 
     private List<TreeNode> buildTree(int lo, int hi) {
