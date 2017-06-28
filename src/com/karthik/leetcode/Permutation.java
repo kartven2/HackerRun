@@ -14,13 +14,13 @@ public class Permutation {
     public static void main(String... args) {
         Permutation p = new Permutation();
         long startTime = System.nanoTime();
-        p.permute(5, true);
+        p.permute(3, true);
         System.out.println("Total : " + p.count);
         long duration = System.nanoTime() - startTime;
         System.out.println("Duration : " + duration + " nano secs");
         p.count = 0;
         startTime = System.nanoTime();
-        p.permute(5, false);
+        p.permute(3, false);
         System.out.println("Total : " + p.count);
         duration = System.nanoTime() - startTime;
         System.out.println("Duration : " + duration + " nano secs");
@@ -71,7 +71,7 @@ public class Permutation {
         for (int i = start; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 swap(a, i, j);
-                build(a, i + 1, n);
+                build2(a, i + 1, n);
                 swap(a, i, j);
             }
         }
