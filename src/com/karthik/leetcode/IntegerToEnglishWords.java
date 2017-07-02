@@ -79,6 +79,6 @@ public class IntegerToEnglishWords {
 
     public static void main(String... args) {
         IntegerToEnglishWords iew = new IntegerToEnglishWords();
-        System.out.println(iew.numberToWords(1000000007));
+        System.out.println(iew.numberToWords(1000080007));
     }
 }
