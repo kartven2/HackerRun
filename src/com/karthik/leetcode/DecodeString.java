@@ -15,8 +15,6 @@
  */
 package com.karthik.leetcode;
 
-import java.util.Stack;
-
 /**
  * @author Karthik Venkataraman
  * @email kafy83@gmail.com
@@ -32,33 +30,34 @@ public class DecodeString {
         if (s == null || s.length() == 0) {
             return "";
         }
-        StringBuilder ans = new StringBuilder();
-        Stack<Integer> val = new Stack<>();
-        Stack<String> expr = new Stack<>();
-        int n = s.length();
+        int n = s.length(), valsp = 0, exprsp = 0;
+        int[] val = new int[n];
+        String[] expr = new String[n];
         char[] c = s.toCharArray();
         for (int i = 0; i < n;) {
-            int num = 0;
             if (c[i] > '0' && c[i] <= '9') {
+                int num = 0;
                 while (i < n && (c[i] >= '0' && c[i] <= '9')) {
                     num = num * 10 + (c[i] - '0');
                     i++;
                 }
-                val.push(num);
+                val[valsp++] = num;
             } else if (c[i] == '[') {
-                expr.push("[");
+                expr[exprsp++] = "[";
                 i++;
             } else if (c[i] == ']') {
-                StringBuilder sb = new StringBuilder();
-                while (!expr.isEmpty() && !expr.peek().equals("[")) {
-                    sb.insert(0, expr.pop());
-                }
-                num = val.pop();
-                while (num-- > 0) {
-                    ans.append(sb);
-                }
-                expr.push(ans.toString());
                 i++;
+                StringBuilder sb = new StringBuilder();
+                while (!expr[exprsp - 1].equals("[")) {
+                    sb.insert(0, expr[--exprsp]);
+                }
+                --exprsp;
+                int num = val[--valsp];
+                StringBuilder sub = new StringBuilder();
+                while (num-- > 0) {
+                    sub.append(sb);
+                }
+                expr[exprsp++] = sub.toString();
             } else {
                 StringBuilder str = new StringBuilder();
                 while (i < n && ((c[i] >= 'a' && c[i] <= 'z')
@@ -66,8 +65,12 @@ public class DecodeString {
                     str.append(c[i]);
                     i++;
                 }
-                expr.push(str.toString());
+                expr[exprsp++] = str.toString();
             }
+        }
+        StringBuilder ans = new StringBuilder();
+        while (exprsp > 0) {
+            ans.insert(0, expr[--exprsp]);
         }
         return ans.toString();
     }
