@@ -34,6 +34,26 @@ public class BinaryTreePreorderTraversal {
         stk.push(x);
         while (!stk.isEmpty()) {
             TreeNode y = stk.pop();
+            result.add(y.val);
+            if (y.right != null) {
+                stk.push(y.right);
+            }
+            if (y.left != null) {
+                stk.push(y.left);
+            }
+        }
+        return result;
+    }
+
+    public List<Integer> preorderTraversal2(TreeNode x) {
+        List<Integer> result = new LinkedList<>();
+        if (x == null) {
+            return result;
+        }
+        Stack<TreeNode> stk = new Stack<>();
+        stk.push(x);
+        while (!stk.isEmpty()) {
+            TreeNode y = stk.pop();
             while (y != null) {
                 result.add(y.val);
                 if (y.right != null) {
