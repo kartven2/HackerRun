@@ -16,6 +16,26 @@ import java.util.Arrays;
  */
 public class ValidTriangleNumber {
 
+    public int triangleNumber2(int[] a) {
+        if (a == null || a.length < 3) {
+            return 0;
+        }
+        Arrays.sort(a);
+        int ans = 0;
+        for (int i = a.length - 1; i >= 2; i--) {
+            int l = 0, r = i - 1;
+            while (l < r) {
+                if (a[l] + a[r] > a[i]) {
+                    ans += (r - l);
+                    r--;
+                } else {
+                    l++;
+                }
+            }
+        }
+        return ans;
+    }
+
     private int findCountInInterval(int[] a, int lo, int hi, int aidx, int bidx) {
         int val1 = a[bidx] - a[aidx], val2 = a[aidx] + a[bidx];
         while (lo <= hi && a[lo] <= val1) {
