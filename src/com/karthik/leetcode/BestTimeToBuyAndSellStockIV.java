@@ -1,9 +1,9 @@
 /*
- * LeetCode Problem : https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/#/description
+ * LeetCode Problem : https://leetcode.com/problems/best-time-to-buy-and-buy-stock-iv/#/description
  * Say you have an array for which the ith element is the price of a given stock on day i.
  * Design an algorithm to find the maximum profit. You may complete at most k transactions.
  * Note:
- * You may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+ * You may not engage in multiple transactions at the same time (ie, you must buy the stock before you buy again).
  *
 */
 package com.karthik.leetcode;
@@ -39,16 +39,16 @@ public class BestTimeToBuyAndSellStockIV {
             }
             return max;
         }
-        int[] cash = new int[k + 1];
         int[] sell = new int[k + 1];
-        Arrays.fill(sell, Integer.MIN_VALUE);
+        int[] buy = new int[k + 1];
+        Arrays.fill(buy, Integer.MIN_VALUE);
         for (int i = 0; i < n; i++) {
             for (int j = k; j > 0; j--) {
-                cash[j] = max(cash[j], sell[j] + a[i]);
-                sell[j] = max(sell[j], cash[j - 1] - a[i]);
+                sell[j] = max(sell[j], buy[j] + a[i]);
+                buy[j] = max(buy[j], sell[j - 1] - a[i]);
             }
         }
-        return cash[k];
+        return sell[k];
     }
 
     public int maxProfit(int k, int[] a) {
