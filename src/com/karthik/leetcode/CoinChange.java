@@ -28,6 +28,36 @@ import java.util.Set;
  */
 public class CoinChange {
 
+    public int coinChange2(int[] a, int amt) {
+        if (amt == 0) {
+            return 0;
+        }
+        if (a == null || a.length == 0) {
+            return -1;
+        }
+        Arrays.sort(a);
+        Integer[] dp = new Integer[amt + 1];
+        dp[0] = 0;
+        for (int x : a) {
+            if (x <= amt) {
+                dp[x] = 1;
+            }
+        }
+        int n = a.length;
+        for (int i = 1; i <= amt; i++) {
+            if (dp[i] == null) {
+                dp[i] = Integer.MAX_VALUE;
+                for (int j = 0; j < n && a[j] <= i; j++) {
+                    if (dp[i - a[j]] != null) {
+                        dp[i] = Math.min(dp[i], 1 + dp[i - a[j]]);
+                    }
+                }
+                dp[i] = dp[i] == Integer.MAX_VALUE ? null : dp[i];
+            }
+        }
+        return dp[amt] == null ? -1 : dp[amt];
+    }
+
     public int coinChange(int[] coins, int amount) {
         if (amount == 0) {
             return 0;
