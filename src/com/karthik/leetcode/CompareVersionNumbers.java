@@ -20,6 +20,26 @@ package com.karthik.leetcode;
  */
 public class CompareVersionNumbers {
 
+    public int compareVersion2(String v1, String v2) {
+        String[] a = v1.split("\\.");
+        String[] b = v2.split("\\.");
+        for (int i = 0; (i < a.length || i < b.length); i++) {
+            if (i < a.length && i < b.length) {
+                int ai = Integer.parseInt(a[i]);
+                int bi = Integer.parseInt(b[i]);
+                if (ai == bi) {
+                    continue;
+                }
+                return ai > bi ? 1 : -1;
+            } else if (i < a.length && Integer.parseInt(a[i]) != 0) {
+                return 1;
+            } else if (i < b.length && Integer.parseInt(b[i]) != 0) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
     public int compareVersion(String v1, String v2) {
         if ((v1 == null && v2 == null) || (v1.trim().isEmpty() && v2.trim().isEmpty())) {
             return 0;
