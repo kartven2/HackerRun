@@ -26,24 +26,23 @@ public class CombinationSum {
             return result;
         }
         Arrays.sort(a);
+        if (x < a[0]) {
+            return result;
+        }
         build(a, result, x, new LinkedList<>(), 0);
         return result;
     }
 
     private void build(int[] a, List<List<Integer>> result, int x, List<Integer> sub, int start) {
         if (x == 0) {
-            result.add(sub);
+            List<Integer> list = new LinkedList<>(sub);
+            result.add(list);
             return;
         }
-        if (x < a[0]) {
-            return;
-        }
-        for (int j = start; j < a.length; j++) {
-            if (x - a[j] >= 0) {
-                List<Integer> list = new LinkedList<>(sub);
-                list.add(a[j]);
-                build(a, result, x - a[j], list, j);
-            }
+        for (int j = start; j < a.length && (x - a[j] >= 0); j++) {
+            sub.add(a[j]);
+            build(a, result, x - a[j], sub, j);
+            sub.remove(sub.size() - 1);
         }
     }
 }
