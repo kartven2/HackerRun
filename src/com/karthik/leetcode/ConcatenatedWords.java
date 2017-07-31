@@ -59,27 +59,23 @@ public class ConcatenatedWords {
             }
             return true;
         }
-
-        if (cword.length() < minLen) {
-            return false;
-        }
-
-        for (int k = 1; k <= cword.length(); k++) {
-            if (map.containsKey(k)) {
+        if (cword.length() >= minLen) {
+            for (int k = 1; k <= cword.length(); k++) {
                 Set<String> wrds = map.get(k);
-                String currentSubStr = cword.substring(0, k);
-                if (!oword.equals(currentSubStr) && wrds.contains(currentSubStr) && verifyConcatenated(result, map, cword.substring(k), oword, minLen)) {
-                    return true;
+                if (wrds != null) {
+                    String currWord = cword.substring(0, k);
+                    if (!oword.equals(currWord) && wrds.contains(currWord) && verifyConcatenated(result, map, cword.substring(k), oword, minLen)) {
+                        return true;
+                    }
                 }
             }
         }
-
         return false;
     }
 
     public static void main(String... args) {
         ConcatenatedWords cw = new ConcatenatedWords();
-        String[] input = {"cat", "cats", "catsdogcats", "dog", "dogcatsdog", "hippopotamuses", "rat", "ratcatdogcat"};
+        String[] input = {"cat", "cats", "catsdogcats", "dog", "dogcatsdog", "hippopotamuses", "ratcatdogcat"};
         List<String> ans = cw.findAllConcatenatedWordsInADict(input);
         for (String x : ans) {
             System.out.println(x);
