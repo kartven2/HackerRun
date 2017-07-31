@@ -13,6 +13,8 @@
  */
 package com.karthik.leetcode;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,6 +27,39 @@ import java.util.Set;
  * @email kafy83@gmail.com
  */
 public class ConcatenatedWords {
+
+    private boolean canAdd(String x, Set<String> set) {
+        if (x.length() == 0) {
+            return true;
+        }
+        for (int k = 1; k <= x.length(); k++) {
+            String cw = x.substring(0, k);
+            if (set.contains(cw) && canAdd(x.substring(k), set)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<String> findAllConcatenatedWordsInADict2(String[] words) {
+        if (words == null || words.length < 2) {
+            return new LinkedList<>();
+        }
+        Arrays.sort(words, new Comparator<String>() {
+            public int compare(String a, String b) {
+                return a.length() - b.length();
+            }
+        });
+        Set<String> set = new HashSet<>();
+        List<String> result = new LinkedList<>();
+        for (String x : words) {
+            if (!set.isEmpty() && canAdd(x, set)) {
+                result.add(x);
+            }
+            set.add(x);
+        }
+        return result;
+    }
 
     public List<String> findAllConcatenatedWordsInADict(String[] words) {
         List<String> result = new LinkedList<>();
@@ -76,7 +111,7 @@ public class ConcatenatedWords {
     public static void main(String... args) {
         ConcatenatedWords cw = new ConcatenatedWords();
         String[] input = {"cat", "cats", "catsdogcats", "dog", "dogcatsdog", "hippopotamuses", "ratcatdogcat"};
-        List<String> ans = cw.findAllConcatenatedWordsInADict(input);
+        List<String> ans = cw.findAllConcatenatedWordsInADict2(input);
         for (String x : ans) {
             System.out.println(x);
         }
