@@ -16,11 +16,27 @@ public class ContainerWithMostWater {
 
     public static void main(String... args) {
         ContainerWithMostWater cmw = new ContainerWithMostWater();
-        int[] a = {2, 1};
-        cmw.maxArea(a);
+        int[] a = {2, 4, 6, 8};
+        System.out.println(cmw.maxArea(a));
     }
 
     public int maxArea(int[] a) {
+        if (a == null || a.length == 0) {
+            return 0;
+        }
+        int max = 0, lo = 0, hi = a.length - 1;
+        while (lo < hi) {
+            max = Math.max(max, ((hi - lo) * Math.min(a[hi], a[lo])));
+            if (a[lo] < a[hi]) {
+                lo++;
+            } else {
+                hi--;
+            }
+        }
+        return max;
+    }
+
+    public int maxArea2(int[] a) {
         if (a == null || a.length == 0) {
             return 0;
         }
