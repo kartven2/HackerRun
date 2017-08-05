@@ -25,8 +25,8 @@ package com.karthik.leetcode;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Karthik Venkataraman
@@ -64,12 +64,12 @@ public class IsSubsequence {
         if (t == null || t.trim().isEmpty()) {
             return false;
         }
-        List<Integer>[] a = (List<Integer>[]) new LinkedList[26];
+        List<Integer>[] a = (List<Integer>[]) new ArrayList[26];
         int n = t.length();
         for (int i = 0; i < n; i++) {
             int idx = t.charAt(i) - 'a';
             if (a[idx] == null) {
-                a[idx] = new LinkedList<>();
+                a[idx] = new ArrayList<>();
             }
             a[idx].add(i);
         }
@@ -79,16 +79,16 @@ public class IsSubsequence {
             if (a[idx] == null) {
                 return false;
             }
-            //lastIdx = nextValue(a[idx], lastIdx+1);
-            /*-if (lastIdx == -1) {
-                return false;
-            }*/
-            int pos = Collections.binarySearch(a[idx], lastIdx + 1);
-            pos = pos < 0 ? pos == -1 ? 0 : -pos - 1 : pos;
-            if (pos == a[idx].size()) {
+            lastIdx = nextValue(a[idx], lastIdx + 1);
+            if (lastIdx == -1) {
                 return false;
             }
-            lastIdx = a[idx].get(pos);
+            //int pos = Collections.binarySearch(a[idx], lastIdx + 1);
+            //pos = pos < 0 ? pos == -1 ? 0 : -pos - 1 : pos;
+            //if (pos == a[idx].size()) {
+            //return false;
+            //}
+            //lastIdx = a[idx].get(pos);
         }
         return true;
     }
