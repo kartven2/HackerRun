@@ -8,9 +8,7 @@
 package com.karthik.leetcode;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -18,32 +16,28 @@ import java.util.Set;
  */
 public class CombinationSumIII {
 
+    private int min(int a, int b) {
+        return a <= b ? a : b;
+    }
+
     public List<List<Integer>> combinationSum3(int k, int n) {
         List<List<Integer>> result = new ArrayList<>();
         if (n <= 0 || k <= 0) {
             return result;
         }
-        Set<Integer> set = new HashSet<>();
-        for (int i = 1; i <= Math.min(9, n); i++) {
-            if (!set.contains(i)) {
-                collect(result, set, i, k, n, new ArrayList<>());
-            }
-        }
+        collect(result, 1, k, n, new ArrayList<>());
         return result;
     }
 
-    private void collect(List<List<Integer>> result, Set<Integer> set, int start, int k, int bal, List<Integer> list) {
+    private void collect(List<List<Integer>> result, int start, int k, int bal, List<Integer> list) {
         if (bal == 0 && k == 0) {
             result.add(new ArrayList<>(list));
-            for (int x : list) {
-                set.add(x);
-            }
             return;
         }
-        for (int i = start; i <= Math.min(9, bal) && k > 0; i++) {
+        for (int i = start; i <= min(9, bal) && k > 0; i++) {
             if ((bal - i) >= 0) {
                 list.add(i);
-                collect(result, set, i + 1, k - 1, bal - i, list);
+                collect(result, i + 1, k - 1, bal - i, list);
                 list.remove(list.size() - 1);
             }
         }
