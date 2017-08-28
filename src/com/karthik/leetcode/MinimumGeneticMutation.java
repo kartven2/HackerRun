@@ -16,8 +16,10 @@
  */
 package com.karthik.leetcode;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -71,4 +73,55 @@ public class MinimumGeneticMutation {
         }
         return -1;
     }
+
+    public int minMutation2(String start, String end, String[] bank) {
+        Set<String> set = new HashSet<>();
+        for (String x : bank) {
+            set.add(x);
+        }
+        set.add(start);
+        if (!set.contains(end)) {
+            return -1;
+        }
+        Set<String> set1 = new HashSet<>();
+        set1.add(start);
+        Set<String> set2 = new HashSet<>();
+        set2.add(end);
+        return bfs(set1, set2, set, 0, new char[]{'A', 'C', 'T', 'G'});
+    }
+
+    private int bfs(Set<String> set1, Set<String> set2, Set<String> dict, int lvl, char[] s) {
+        if (set1.isEmpty()) {
+            return -1;
+        }
+        if (set1.size() > set2.size()) {
+            return bfs(set2, set1, dict, lvl, s);
+        }
+        for (String x : set1) {
+            dict.remove(x);
+        }
+        for (String x : set2) {
+            dict.remove(x);
+        }
+        Set<String> set = new HashSet<>();
+        for (String x : set1) {
+            char[] p = x.toCharArray();
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 4; j++) {
+                    char temp = p[i];
+                    p[i] = s[j];
+                    String y = new String(p);
+                    if (set2.contains(y)) {
+                        return lvl + 1;
+                    }
+                    if (dict.contains(y)) {
+                        set.add(y);
+                    }
+                    p[i] = temp;
+                }
+            }
+        }
+        return bfs(set2, set, dict, lvl + 1, s);
+    }
+
 }
