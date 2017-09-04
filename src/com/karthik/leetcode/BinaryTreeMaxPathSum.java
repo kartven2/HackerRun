@@ -16,6 +16,7 @@ package com.karthik.leetcode;
 public class BinaryTreeMaxPathSum {
 
     static class TreeNode {
+
         int val;
         TreeNode left;
         TreeNode right;
@@ -25,9 +26,7 @@ public class BinaryTreeMaxPathSum {
         }
     }
 
-    class Result {
-        int val;
-    }
+    private int result = Integer.MIN_VALUE;
 
     private int max(int a, int b, int c) {
         return a > b && a > c ? a : b > c ? b : c;
@@ -38,21 +37,19 @@ public class BinaryTreeMaxPathSum {
     }
 
     public int maxPathSum(TreeNode x) {
-        Result res = new Result();
-        res.val = Integer.MIN_VALUE;
-        findMax(x, res);
-        return res.val;
+        findMax(x);
+        return result;
     }
 
-    private int findMax(TreeNode x, Result res) {
+    private int findMax(TreeNode x) {
         if (x == null) {
             return 0;
         }
-        int lmax = findMax(x.left, res);
-        int rmax = findMax(x.right, res);
+        int lmax = findMax(x.left);
+        int rmax = findMax(x.right);
         int maxp = max(x.val + lmax, x.val + rmax, x.val);
         int maxs = max(maxp, lmax + rmax + x.val);
-        res.val = max(res.val, maxs);
+        result = max(result, maxs);
         return maxp;
     }
 }
