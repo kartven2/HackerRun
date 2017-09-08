@@ -9,7 +9,9 @@
 package com.karthik.leetcode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Karthik Venkataraman
@@ -93,5 +95,32 @@ public class LongestConsecutiveSequence {
             map.put(a[i], i);
         }
         return uf.getMaxSize();
+    }
+
+    public int longestConsecutive2(int[] a) {
+        if (a == null || a.length == 0) {
+            return 0;
+        }
+        int n = a.length, ans = 1;
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            set.add(a[i]);
+        }
+        while (!set.isEmpty()) {
+            int x = set.iterator().next();
+            set.remove(x);
+            int lb = x;
+            while (set.contains(lb - 1)) {
+                set.remove(lb - 1);
+                lb--;
+            }
+            int ub = x;
+            while (set.contains(ub + 1)) {
+                set.remove(ub + 1);
+                ub++;
+            }
+            ans = Math.max(ans, ub - lb + 1);
+        }
+        return ans;
     }
 }
